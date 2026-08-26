@@ -1,7 +1,7 @@
 import random
 
 class Dados:
-    dev_mode = True
+    dev_mode = False
     dev_sequence = [4, 4, 3, 4]
 
     @staticmethod
