@@ -1,12 +1,12 @@
 from Tablero import Tablero
 
 from Utils import Color
-from Utils import tirar_dados
+from Dados import Dados
 
 tablero = Tablero()
 
 tablero.new_player("Tatu", Color.AMARILLO)
-tablero.new_player("Trive", Color.AZUL)
+tablero.new_player("Trive", Color.VERDE)
 tablero.new_player("Juan", Color.ROJO)
 
 while True:
@@ -15,7 +15,7 @@ while True:
 
         input("\nPresioná ENTER para tirar los dados...")
 
-        dados = tirar_dados()
+        dados = Dados.tirar_dados()
 
         print("\n────────────────────────────────────")
         print(f"DADO: [{dados}]")
