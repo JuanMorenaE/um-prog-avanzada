@@ -24,9 +24,22 @@ while True:
         print("\n¿Qué querés hacer?")
 
         print(f"\n[1] Sacar una ficha ({len(player._fichas)}/{player._max_fichas}).")
-        print("[2] Mover una ficha")
 
-        option = int(input("\n> "))
+        if player._fichas:
+            print("[2] Mover una ficha")
+
+        opciones_validas = [1, 2] if player._fichas else [1]
+
+        while True:
+            try:
+                option = int(input("\n> "))
+
+                if option in opciones_validas:
+                    break
+
+                print(f"Opción inválida, selecciona una opcion disponible ({opciones_validas}) ")
+            except ValueError:
+                print(f"Opción inválida, selecciona una opcion disponible ({opciones_validas})")
 
         if option == 1:
             ficha = player.sacar_ficha()
@@ -40,7 +53,8 @@ while True:
                 print("\n✗ No podés sacar más fichas.")
 
             
-        elif option == 2:
+        elif option == 2 and player._fichas:
+
             print("\nTus fichas:")
             print("────────────────────────────────────")
 
@@ -49,7 +63,18 @@ while True:
             
             print("────────────────────────────────────")
 
-            selected_ficha = int(input("\nSeleccioná una ficha > "))
+            fichas_validas = list(range(1, len(player._fichas) + 1))
+
+            while True:
+                try:
+                    selected_ficha = int(input("\nSeleccioná una ficha > "))
+
+                    if selected_ficha in fichas_validas:
+                        break
+
+                    print(f"Opción inválida, selecciona una opción disponible ({fichas_validas})")
+                except ValueError:
+                    print(f"Opción inválida, selecciona una opción disponible ({fichas_validas})")
 
             ficha = player._fichas[selected_ficha - 1]
             tablero.mover_ficha(ficha, dados)
