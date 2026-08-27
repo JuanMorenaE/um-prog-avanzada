@@ -21,6 +21,17 @@ class Player:
 
         return ficha
 
-    
+    def ganador(self, casilla_final):
+        fichas_finalizadas = 0
+
+        for ficha in self._fichas:
+            if ficha._posicion == casilla_final:
+                fichas_finalizadas += 1
+
+        if fichas_finalizadas == self._max_fichas:
+            return True
+
+        return False
+
 
     

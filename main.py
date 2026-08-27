@@ -1,4 +1,4 @@
-from Tablero import Tablero
+from Tablero import Tablero, CASILLA_FINAL
 
 from Utils import Color
 from Dados import Dados
@@ -9,7 +9,9 @@ tablero.nuevo_jugador("Tatu", Color.AMARILLO)
 tablero.nuevo_jugador("Trive", Color.VERDE)
 tablero.nuevo_jugador("Juan", Color.ROJO)
 
-while True:
+juego_terminado = False
+
+while not juego_terminado:
     for player in tablero._players:
         print(f"\nTurno de {player._name}")
 
@@ -80,5 +82,10 @@ while True:
             tablero.mover_ficha(ficha, dados)
 
             print(f"\n✓ Ficha movida a la posicion {ficha._posicion}.")
+
+        if player.ganador(CASILLA_FINAL):
+            print(f"\n¡{player._name} ganó la partida!")
+            juego_terminado = True
+            break
 
         tablero.mostrar_tablero()

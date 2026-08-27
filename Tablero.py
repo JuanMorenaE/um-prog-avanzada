@@ -44,7 +44,7 @@ class Tablero:
 
         if pos_nueva == CASILLA_FINAL:
             print("¡Una ficha llegó al final!")
-
+        
         fichas_en_casilla = self._casillas[pos_nueva]
 
         # No hay fichas en la nueva posicion o hay pero son del mismo color.
