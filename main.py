@@ -1,7 +1,14 @@
+import os
+import subprocess
+
 from Tablero import Tablero, CASILLA_FINAL
 
 from Utils import Color
 from Dados import Dados
+
+def limpiar_consola():
+    comando = 'cls' if os.name == 'nt' else 'clear'
+    subprocess.run(comando, shell=True)
 
 tablero = Tablero()
 
@@ -13,22 +20,26 @@ juego_terminado = False
 
 while not juego_terminado:
     for player in tablero._players:
-        print(f"\nTurno de {player._name}")
+        limpiar_consola()
+
+        tablero.mostrar_tablero()
+
+        print("\n╔════════════════════════════════════╗")
+        print(f"\tTURNO DE {player._name.upper()} ({player._color.name})")
+        print("╚════════════════════════════════════╝")
 
         input("\nPresioná ENTER para tirar los dados...")
 
         dados = Dados.tirar_dados()
 
-        print("\n────────────────────────────────────")
-        print(f"DADO: [{dados}]")
-        print("────────────────────────────────────")
+        print(f"\n\t⚁ DADO: {dados} ⚁")
 
         print("\n¿Qué querés hacer?")
 
-        print(f"\n[1] Sacar una ficha ({len(player._fichas)}/{player._max_fichas}).")
+        print(f"\n\t[1] Sacar una ficha ({len(player._fichas)}/{player._max_fichas}).")
 
         if player._fichas:
-            print("[2] Mover una ficha")
+            print("\t[2] Mover una ficha")
 
         opciones_validas = [1, 2] if player._fichas else [1]
 
@@ -57,15 +68,18 @@ while not juego_terminado:
             
         elif option == 2 and player._fichas:
 
-            print("\nTus fichas:")
-            print("────────────────────────────────────")
+            print("\n╔══════════════════════════╗")
+            print("\tTUS FICHAS")
+            print("╚══════════════════════════╝")
+
+            fichas_validas = []
 
             for i, ficha in enumerate(player._fichas):
-                print(f"[{i + 1}] Posición: {ficha._posicion}.")
-            
-            print("────────────────────────────────────")
-
-            fichas_validas = list(range(1, len(player._fichas) + 1))
+                if ficha._posicion != CASILLA_FINAL:
+                    print(f"\t[{i + 1}] Posición: {ficha._posicion}")
+                    fichas_validas.append(i + 1)
+                else:
+                    print(f"\t[{i + 1}] Posición: {ficha._posicion} (¡Llegó a la meta!)")
 
             while True:
                 try:
@@ -83,7 +97,6 @@ while not juego_terminado:
 
             print(f"\n✓ Ficha movida a la posicion {ficha._posicion}.")
 
-        tablero.mostrar_tablero()
 
         if player.ganador(CASILLA_FINAL):
             print(f"\n¡{player._name} ganó la partida!")

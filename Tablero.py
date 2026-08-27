@@ -103,25 +103,28 @@ class Tablero:
 
 
     def competencia_dados(self, player1, player2):
+        print("\n╔════════════════════════════════════╗")
+        print(f"\t⚔ COMPETENCIA ⚔")
+        print(f"\t{player1._name} vs {player2._name}")
+        print("╚════════════════════════════════════╝")
+        
         while True:
-            input(f"Turno de {player1._name}, presione ENTER para tirar los dados.")
+            input(f"\nTurno de {player1._name}, presioná ENTER para tirar los dados...")
             player1_score = Dados.tirar_dados()
-            print("\n────────────────────────────────────")
-            print(f"DADO: [{player1_score}]")
-            print("────────────────────────────────────")
+            print(f"\n\t⚁ DADO: {player1_score} ⚁")
 
-            input(f"Turno de {player2._name}, presione ENTER para tirar los dados.")
+            input(f"\nTurno de {player2._name}, presioná ENTER para tirar los dados....")
             player2_score = Dados.tirar_dados()
-            print("\n────────────────────────────────────")
-            print(f"DADO: [{player2_score}]")
-            print("────────────────────────────────────")
+            print(f"\n\t⚁ DADO: {player2_score} ⚁")
 
             if player1_score > player2_score:
-                print(f"El ganador es {player1._name}.")
+                input(f"\n{player1._name} gana la competencia. \n{player2._name} retrocede 2 casillas.")
                 return 1
             elif player2_score > player1_score:
-                print(f"El ganador es {player2._name}.")
+                input(f"\n{player2._name} gana la competencia. \n{player1._name} retrocede 2 casillas.")
                 return 2
+            else:
+                input("\nEmpate, se vuelve a tirar...")
 
 
     # -----------------------------
@@ -130,7 +133,6 @@ class Tablero:
 
     def mostrar_tablero(self):
             # Esta funcion me la hizo el chat para ver momentaneamente.
-            print("\nTABLERO")
             print("─" * 50)
 
             for i, casilla in enumerate(self._casillas):

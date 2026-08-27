@@ -2,7 +2,7 @@ import random
 
 class Dados:
     dev_mode = False
-    dev_sequence = [1, 1, 3, 4]
+    dev_sequence = [4, 4, 2, 2, 1, 3]
 
     @staticmethod
     def tirar_dados():
