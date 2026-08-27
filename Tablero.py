@@ -80,29 +80,6 @@ class Tablero:
             return
 
         self.retroceder_ficha(ficha, pos_actual, pos_nueva - 1)
-    
-
-    def mostrar_tablero(self):
-        # Esta funcion me la hizo el chat para ver momentaneamente.
-        print("\nTABLERO")
-        print("─" * 50)
-
-        for i, casilla in enumerate(self._casillas):
-
-            if len(casilla) == 0:
-                contenido = "·"
-            else:
-                contenido = ",".join(
-                    ficha._color.name[0]
-                    for ficha in casilla
-                )
-
-            print(f"[{i:02}] {contenido}", end="  ")
-
-            if (i + 1) % 6 == 0:
-                print()
-
-        print("─" * 50)
 
 
     def competencia_por_posicion(self, ficha, pos_actual, pos_nueva):
@@ -145,3 +122,30 @@ class Tablero:
             elif player2_score > player1_score:
                 print(f"El ganador es {player2._name}.")
                 return 2
+
+
+    # -----------------------------
+    #          TABLERO
+    # -----------------------------
+
+    def mostrar_tablero(self):
+            # Esta funcion me la hizo el chat para ver momentaneamente.
+            print("\nTABLERO")
+            print("─" * 50)
+
+            for i, casilla in enumerate(self._casillas):
+
+                if len(casilla) == 0:
+                    contenido = "·"
+                else:
+                    contenido = ",".join(
+                        ficha._color.name[0]
+                        for ficha in casilla
+                    )
+
+                print(f"[{i:02}] {contenido}", end="  ")
+
+                if (i + 1) % 6 == 0:
+                    print()
+
+            print("─" * 50)
