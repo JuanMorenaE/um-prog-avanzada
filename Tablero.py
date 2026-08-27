@@ -22,7 +22,7 @@ class Tablero:
         
         player = Player(name, color)
         self._players.append(player)
-
+        
         return player
 
 

@@ -5,9 +5,44 @@ from Dados import Dados
 
 tablero = Tablero()
 
-tablero.nuevo_jugador("Tatu", Color.AMARILLO)
-tablero.nuevo_jugador("Trive", Color.VERDE)
-tablero.nuevo_jugador("Juan", Color.ROJO)
+while True:
+
+    print("=" * 30)
+    print("  1. Jugar")
+    print("  2. Agregar jugador")
+    print("=" * 30)
+
+    opcion = input("Seleccione una opción [1-2]: ")
+
+    if opcion == "1":
+        if tablero._players != []:
+            print("¡A jugar!")
+            break
+        else:
+            input("Necesitas al menos un jugador para iniciar el juego, presiona ENTER para continuar")
+            continue
+
+    elif opcion == "2":
+        name = input("¿Como te llamas?")
+        
+        for color in Color:
+            print(color.name)
+
+        color = input("Elije tu color").upper()
+
+        while tablero.buscar_jugador_por_color(color) != None:
+            print("Ese color ya esta seleccionado, elija otro color")
+            
+            for color in Color:
+                print(color.name)
+            color = input()
+
+        tablero.nuevo_jugador(name,color)
+        continue
+
+    else:
+        input("Opcion seleccionada inválida, presione ENTER para continuar")
+
 
 juego_terminado = False
 
