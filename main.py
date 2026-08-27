@@ -13,36 +13,59 @@ def limpiar_consola():
 tablero = Tablero()
 
 while True:
+    limpiar_consola()
 
-    print("=" * 30)
-    print("  1. Jugar")
-    print("  2. Agregar jugador")
-    print("=" * 30)
+    print("\n╔════════════════════════════╗")
+    print("\tJUEGO")
+    print("╚════════════════════════════╝")
 
-    opcion = input("Seleccione una opción [1-2]: ")
+    if tablero._players:
+        print("\nJugadores:")
+        for p in tablero._players:
+            print(f"  • {p._color.name.capitalize()} - {p._name}")
+
+
+    print("\n\t[1] Jugar")
+    print("\t[2] Agregar jugador")
+
+    opcion = input("\nSeleccione una opción [1-2] > ")
 
     if opcion == "1":
-        if tablero._players != []:
+        if len(tablero._players) != 0:
             print("¡A jugar!")
             break
         else:
-            input("Necesitas al menos un jugador para iniciar el juego, presiona ENTER para continuar")
+            input("\nx Necesitás al menos un jugador para iniciar el juego. Presioná ENTER para continuar...")
             continue
 
     elif opcion == "2":
-        name = input("¿Como te llamas?")
-        
+        name = input("¿Como te llamas? > ")
+
+        print("\nColores disponibles:")
         for color in Color:
-            print(color.name)
+            print(f"\t• {color.name}")
 
-        color = input("Elije tu color").upper()
+        color = input("\nElegí tu color > ").upper()
 
-        while tablero.buscar_jugador_por_color(color) != None:
-            print("Ese color ya esta seleccionado, elija otro color")
-            
+        try:
+            color = Color[color]
+        except KeyError:
+            input(f"\nx '{color}' no es un color válido. Presioná ENTER para continuar...")
+            continue
+
+        while tablero.buscar_jugador_por_color(color) is not None:
+            print("\n x Ese color ya esta seleccionado, elegí otro color")
+
+            print("\nColores disponibles:")
             for color in Color:
-                print(color.name)
-            color = input()
+                print(f"\t• {color.name}")
+    
+            color = input("\nElegí otro color > ").upper()
+            
+            try:
+                color = Color[color]
+            except KeyError:
+                input(f"\nx '{color}' no es un color válido...")
 
         tablero.nuevo_jugador(name,color)
         continue

@@ -33,7 +33,7 @@ class Tablero:
 
 
     def buscar_jugador_por_color(self, color):
-        return next(filter(lambda x: x._color == color, self._players))
+        return next(filter(lambda x: x._color == color, self._players), None)
 
 
     # -----------------------------
