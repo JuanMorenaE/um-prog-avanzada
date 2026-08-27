@@ -4,7 +4,13 @@ from Dados import Dados
 TOTAL_CASILLAS = 36
 CASILLA_FINAL = TOTAL_CASILLAS - 1
 MAX_JUGADORES = 4
-
+CASILLAS_ESPECIALES = {
+    5: "P1",
+    11: "P2",
+    16: "P3",
+    22: "C1",
+    29: "C2"
+}
 class Tablero:
     def __init__(self):
         self._casillas = [[] for _ in range (TOTAL_CASILLAS)]
@@ -44,7 +50,7 @@ class Tablero:
 
         if pos_nueva == CASILLA_FINAL:
             print("¡Una ficha llegó al final!")
-        
+
         fichas_en_casilla = self._casillas[pos_nueva]
 
         # No hay fichas en la nueva posicion o hay pero son del mismo color.
@@ -122,8 +128,32 @@ class Tablero:
             elif player2_score > player1_score:
                 print(f"El ganador es {player2._name}.")
                 return 2
-
-
+    
+    def obtener_casilla_especial(self,posicion):
+        if posicion in CASILLAS_ESPECIALES:
+            return CASILLAS_ESPECIALES[posicion]
+        return None
+    
+    def aplicar_casilla_especial(self,ficha):
+        efecto=self.obtener_casilla_especial(ficha._posicion)
+        
+        if efecto=="P3":
+            print("\n Casilla con premio P3!! La ficha avanza 2 casillas.")
+            
+            self.mover_ficha(ficha, 2)
+        elif efecto=="C2":
+            print("\n Casilla con castigo C2!! La ficha retrocede 3 casillas.")
+            
+            posicion_actual=ficha._posicion
+            posicion_nueva=posicion_actual-3
+            self.retroceder_ficha(ficha,posicion_actual,posicion_nueva)
+        elif efecto=="C1":
+            pass
+        elif efecto=="P1":
+            pass
+        elif efecto=="P2":
+            pass
+        return efecto
     # -----------------------------
     #          TABLERO
     # -----------------------------

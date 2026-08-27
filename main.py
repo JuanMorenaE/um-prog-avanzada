@@ -51,6 +51,7 @@ while not juego_terminado:
                 tablero.mover_ficha(ficha, dados)
 
                 print(f"\n✓ Ficha movida {dados} posiciones.")
+                tablero.aplicar_casilla_especial(ficha)
             else:
                 print("\n✗ No podés sacar más fichas.")
 
@@ -82,6 +83,7 @@ while not juego_terminado:
             tablero.mover_ficha(ficha, dados)
 
             print(f"\n✓ Ficha movida a la posicion {ficha._posicion}.")
+            tablero.aplicar_casilla_especial(ficha)
 
         tablero.mostrar_tablero()
 
