@@ -5,9 +5,9 @@ from Dados import Dados
 
 tablero = Tablero()
 
-tablero.new_player("Tatu", Color.AMARILLO)
-tablero.new_player("Trive", Color.VERDE)
-tablero.new_player("Juan", Color.ROJO)
+tablero.nuevo_jugador("Tatu", Color.AMARILLO)
+tablero.nuevo_jugador("Trive", Color.VERDE)
+tablero.nuevo_jugador("Juan", Color.ROJO)
 
 while True:
     for player in tablero._players:
