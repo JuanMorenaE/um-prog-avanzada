@@ -51,10 +51,6 @@ while not juego_terminado:
                 tablero.mover_ficha(ficha, dados)
 
                 print(f"\n✓ Ficha movida {dados} posiciones.")
-                if player.ganador(CASILLA_FINAL):
-                    print(f"\n¡{player._name} ganó la partida!")
-                    juego_terminado = True
-                    break
             else:
                 print("\n✗ No podés sacar más fichas.")
 
@@ -87,9 +83,9 @@ while not juego_terminado:
 
             print(f"\n✓ Ficha movida a la posicion {ficha._posicion}.")
 
-            if player.ganador(CASILLA_FINAL):
-                print(f"\n¡{player._name} ganó la partida!")
-                juego_terminado = True
-                break
+        if player.ganador(CASILLA_FINAL):
+            print(f"\n¡{player._name} ganó la partida!")
+            juego_terminado = True
+            break
 
         tablero.mostrar_tablero()
