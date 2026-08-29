@@ -6,6 +6,7 @@ class Player:
         self._name = name
         self._color = color
         self._fichas = [] # Un jugador puede tener mas de 1 ficha para mover.
+        self._pierde_proximo_turno = False
 
         ##Bien básico, podriamos meterle debuffs segun la casilla en la que cae o alguna cosa medio falopa. Despues vemos
 

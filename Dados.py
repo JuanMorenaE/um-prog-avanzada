@@ -1,8 +1,8 @@
 import random
 
 class Dados:
-    dev_mode = False
-    dev_sequence = [4, 4, 2, 2, 1, 3]
+    dev_mode = True
+    dev_sequence = [5, 22, 3]
 
     @staticmethod
     def tirar_dados():

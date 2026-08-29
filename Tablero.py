@@ -1,21 +1,24 @@
 from Player import Player
 from Dados import Dados
+from Utils import Color
 
 TOTAL_CASILLAS = 36
 CASILLA_FINAL = TOTAL_CASILLAS - 1
 MAX_JUGADORES = 4
-CASILLAS_ESPECIALES = {
-    5: "P1",
-    11: "P2",
-    16: "P3",
-    22: "C1",
-    29: "C2"
-}
-class Tablero:
+
+class Tablero:    
     def __init__(self):
         self._casillas = [[] for _ in range (TOTAL_CASILLAS)]
         self._max_players = MAX_JUGADORES
         self._players = []
+        self._casillas_especiales = {
+            5: self.efecto_P1,
+            11: self.efecto_P2,
+            16: self.efecto_C1,
+            22: self.efecto_P3,
+            29: self.efecto_C2,
+        }
+
 
     # -----------------------------
     #          JUGADORES
@@ -66,6 +69,7 @@ class Tablero:
         self._casillas[pos_actual].remove(ficha)
         self._casillas[pos_nueva].append(ficha)
         ficha._posicion = pos_nueva
+
 
     def retroceder_ficha(self, ficha, pos_actual, pos_nueva):
         # Si llegó a la primer casilla, no importa si hay jugadores queda ahí.
@@ -132,32 +136,96 @@ class Tablero:
             else:
                 input("\nEmpate, se vuelve a tirar...")
 
-    
+
+    # -----------------------------
+    #      CASILLAS ESPECIALES
+    # -----------------------------
+
     def obtener_casilla_especial(self,posicion):
-        if posicion in CASILLAS_ESPECIALES:
-            return CASILLAS_ESPECIALES[posicion]
-        return None
+        return self._casillas_especiales.get(posicion)
+
     
-    def aplicar_casilla_especial(self,ficha):
-        efecto=self.obtener_casilla_especial(ficha._posicion)
+    def aplicar_casilla_especial(self,ficha, player):
+        efecto = self.obtener_casilla_especial(ficha._posicion)
         
-        if efecto=="P3":
-            print("\n Casilla con premio P3!! La ficha avanza 2 casillas.")
-            
-            self.mover_ficha(ficha, 2)
-        elif efecto=="C2":
-            print("\n Casilla con castigo C2!! La ficha retrocede 3 casillas.")
-            
-            posicion_actual=ficha._posicion
-            posicion_nueva=posicion_actual-3
-            self.retroceder_ficha(ficha,posicion_actual,posicion_nueva)
-        elif efecto=="C1":
-            pass
-        elif efecto=="P1":
-            pass
-        elif efecto=="P2":
-            pass
-        return efecto
+        if efecto is None:
+            return None
+
+        efecto(ficha, player)
+    
+
+    def efecto_P1(self, ficha, player): # Elige un color para que pierda un turno
+        input("\nCaíste en la casilla P1: 'Elige un color para que pierda un turno'.")
+
+        candidatos = [p for p in self._players if p != player]
+
+        while True:
+            print()
+            for candidato in candidatos:
+                print(f"\t• {candidato._color.name}")
+
+            color = input("\nElegí el color que va a perder un turno > ").upper()
+
+            try:
+                color = Color[color]
+            except:
+                input(f"\nx '{color}' no es un color válido. Presioná ENTER para continuar...")
+                continue
+
+            player_pierde_turno = next((p for p in candidatos if p._color == color), None)
+
+            if player_pierde_turno is None:
+                input(f"\nx '{color.name}' no es un color válido. Presioná ENTER para continuar...")
+                continue
+
+            player_pierde_turno._pierde_proximo_turno = True
+
+            input(f"\nEl jugador '{player_pierde_turno._name}' pierde un turno.")
+
+            return
+        
+
+    def efecto_P2(self, ficha, player): # Tira el dado nuevamente y avanza
+        input("\nCaíste en la casilla P2: 'Tira el dado nuevamente y avanza'.")
+
+        input("\nPresioná ENTER para tirar los dados...")
+        
+        dados = Dados.tirar_dados()
+
+        print(f"\n\t⚁ DADO: {dados} ⚁")
+
+        self.mover_ficha(ficha, dados)
+
+        input(f"\n✓ Ficha movida {dados} posiciones.")
+        
+        pass
+
+
+    def efecto_P3(self, ficha, player): # Avanza 2 casillas
+        input("\nCaíste en la casilla P3: ' Avanza 2 casillas'.")
+
+        self.mover_ficha(ficha, 2)
+        
+        input(f"\n✓ Ficha movida 2 posiciones.")
+
+        pass
+
+
+    def efecto_C1(self, ficha, player): #  Pierde 1 turno
+        input("\nCaíste en la casilla C1: 'Pierde 1 turno'.")
+        player._pierde_proximo_turno = True
+
+        pass
+
+
+    def efecto_C2(self, ficha, player): # Retrocede 3 casillas
+        input("\nCaíste en la casilla C2: 'Retrocede 3 casillas'.")
+
+        self.mover_ficha(ficha, -3)
+                
+        input(f"\n✓ Ficha retrocede 3 posiciones.")
+
+        pass
 
     
     # -----------------------------
@@ -165,7 +233,7 @@ class Tablero:
     # -----------------------------
 
     def mostrar_tablero(self):
-            # Esta funcion me la hizo el chat para ver momentaneamente.
+            # Esta funcion me la hizo el chat para ver momentaneamente el tablero.
             print("─" * 50)
 
             for i, casilla in enumerate(self._casillas):

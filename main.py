@@ -86,6 +86,11 @@ while not juego_terminado:
         print(f"\tTURNO DE {player._name.upper()} ({player._color.name})")
         print("╚════════════════════════════════════╝")
 
+        if player._pierde_proximo_turno:
+            input("\nEl jugador pierde el turno...")
+            player._pierde_proximo_turno = False
+            continue
+
         input("\nPresioná ENTER para tirar los dados...")
 
         dados = Dados.tirar_dados()
@@ -120,7 +125,7 @@ while not juego_terminado:
                 tablero.mover_ficha(ficha, dados)
 
                 print(f"\n✓ Ficha movida {dados} posiciones.")
-                tablero.aplicar_casilla_especial(ficha)
+                tablero.aplicar_casilla_especial(ficha, player)
             else:
                 print("\n✗ No podés sacar más fichas.")
 
@@ -155,7 +160,7 @@ while not juego_terminado:
             tablero.mover_ficha(ficha, dados)
 
             print(f"\n✓ Ficha movida a la posicion {ficha._posicion}.")
-            tablero.aplicar_casilla_especial(ficha)
+            tablero.aplicar_casilla_especial(ficha, player)
 
 
         if player.ganador(CASILLA_FINAL):
