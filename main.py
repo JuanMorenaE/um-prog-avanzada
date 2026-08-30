@@ -61,6 +61,8 @@ def main():
 
             opciones = {}
             for color in Color:
+                if juego.obtener_jugador_por_color(color) is not None:
+                    continue
                 opciones[f"{color.name}"] = color
 
             color = mostrar_opciones(opciones)
