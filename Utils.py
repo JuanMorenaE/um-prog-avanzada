@@ -8,6 +8,16 @@ class Color(Enum):
     AMARILLO = 4
 
 
+def componer(f, g):
+    return lambda x: f(g(x))
+
+
+nombre_color = componer(
+    str.capitalize,
+    lambda color: color.name
+)
+
+
 def logDecorator(function):
     def wrapper():
         start = time.time()

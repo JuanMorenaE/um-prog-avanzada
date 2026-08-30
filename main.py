@@ -5,7 +5,7 @@ import time
 
 from Opciones import mostrar_opciones
 from Juego import Juego
-from Utils import Color, logDecorator
+from Utils import Color, logDecorator, nombre_color
 from Constantes import ESPERA_MODO_AUTOMATICO
 
 juego = Juego()
@@ -34,7 +34,7 @@ def main():
         if juego.jugadores:
             print("\nJugadores:")
             for p in juego.jugadores:
-                print(f"  • {p.color.name.capitalize()} - {p.nombre}")
+                print(f"  • {nombre_color(p.color)} - {p.nombre}")
 
 
         opcion = mostrar_opciones({
