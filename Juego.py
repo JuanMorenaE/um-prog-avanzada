@@ -3,6 +3,7 @@ from Player import Player
 from Dados import Dados
 from Opciones import mostrar_opciones
 from Constantes import MAX_JUGADORES
+from Vista import Vista
 
 class Juego:
     def __init__(self):
@@ -10,6 +11,7 @@ class Juego:
         self.tablero = Tablero()
         self.jugadores = []
         self.max_jugadores = MAX_JUGADORES
+        self.vista = Vista(self.tablero)
 
 
     # -----------------------------
@@ -39,13 +41,13 @@ class Juego:
     def turno_jugador(self, jugador: Player):
         if jugador.pierde_proximo_turno:
             print("\nEl jugador pierde el turno...")
-            if not self.autoMode:
+            if not self.auto_mode:
                 input()
 
             jugador.pierde_proximo_turno = False
             return
 
-        if not self.autoMode:
+        if not self.auto_mode:
             input("\nPresioná ENTER para tirar los dados...")
 
         dados = Dados.tirar_dados()
@@ -62,8 +64,8 @@ class Juego:
         if len(jugador.fichas) != 0:
             opciones[f"Mover una ficha"] = lambda: self.mover_ficha(jugador, dados)
 
-        opcion = mostrar_opciones(opciones, self.auto_mode)
-        opcion()
+        funcion = mostrar_opciones(opciones, self.auto_mode)
+        funcion()
 
  
     def sacar_ficha(self, jugador: Player):
@@ -99,7 +101,7 @@ class Juego:
         ficha = jugador.fichas[selected_ficha - 1]
         self.tablero.mover_ficha(ficha, dados)
 
-        print(f"\n✓ Ficha movida a la posicion {ficha._posicion}.")
-        vista.dibujar()
+        print(f"\n✓ Ficha movida a la posicion {ficha.posicion}.")
+        self.vista.dibujar()
         self.tablero.aplicar_casilla_especial(ficha, jugador)
-        vista.dibujar()
+        self.vista.dibujar()

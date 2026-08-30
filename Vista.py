@@ -98,7 +98,7 @@ class Vista:
         self._pantalla.blit(numero, (rect.x + 5, rect.y + 4))
 
     def dibujar_fichas(self, posicion):
-        fichas = self._tablero._casillas[posicion]
+        fichas = self._tablero.casillas[posicion]
 
         if not fichas:
             return
@@ -115,7 +115,7 @@ class Vista:
         for i, ficha in enumerate(fichas):
             centro = (inicio_x + i * (radio + 2), centro_y)
 
-            pygame.draw.circle(self._pantalla, COLORES_FICHA[ficha._color], centro, radio)
+            pygame.draw.circle(self._pantalla, COLORES_FICHA[ficha.color], centro, radio)
             pygame.draw.circle(self._pantalla, COLOR_BORDE, centro, radio, width=2)
 
     def dibujar(self):
@@ -146,7 +146,7 @@ if __name__ == "__main__":
 
     # Fichas de ejemplo para ver el recorrido.
     for posicion, color in [(0, Color.ROJO), (5, Color.VERDE), (18, Color.AZUL), (35, Color.AMARILLO)]:
-        tablero._casillas[posicion].append(Ficha(color, posicion))
+        tablero.casillas[posicion].append(Ficha(color, posicion))
 
     vista = Vista(tablero)
 

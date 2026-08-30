@@ -9,23 +9,21 @@ from Tablero import Tablero
 from Vista import Vista
 from Utils import Color
 
+juego = Juego()
+
 
 def limpiar_consola():
     comando = 'cls' if os.name == 'nt' else 'clear'
     subprocess.run(comando, shell=True)
 
 
-tablero = Tablero()
-
-
 def turnos():
-    for player in tablero._players:
+    for player in juego.jugadores:
         yield player
 
 
 def main():
     pygame.init()
-    juego = Juego()
     
     while True:
         limpiar_consola()
@@ -81,17 +79,12 @@ def main():
         else:
             input("Opcion seleccionada inválida, presione ENTER para continuar")
 
-
-    vista = Vista(tablero)
-
     auto_mode = mostrar_opciones({
         "Juego Automatico": True,
         "Juego Manual": False
     })
-
-    print("Auto Mode: ", auto_mode)
-
     juego.auto_mode = auto_mode
+    print("Auto Mode: ", auto_mode)
 
     juego_terminado = False
     while not juego_terminado:
@@ -101,9 +94,7 @@ def main():
                 time.sleep(1)
 
             limpiar_consola()
-
-            tablero.mostrar_tablero()
-            vista.dibujar()
+            juego.vista.dibujar()
 
             print("\n╔════════════════════════════════════╗")
             print(f"\tTURNO DE {jugador.nombre.upper()} ({jugador.color.name})")
