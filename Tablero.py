@@ -1,9 +1,7 @@
 from Player import Player
 from Dados import Dados
-from Utils import Color
 from Ficha import Ficha
 from Constantes import TOTAL_CASILLAS, CASILLA_FINAL
-from Opciones import mostrar_opciones
 
 class Tablero:    
     def __init__(self):

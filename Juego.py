@@ -5,7 +5,6 @@ from Opciones import mostrar_opciones
 from Constantes import MAX_JUGADORES
 from Vista import Vista
 from Ficha import Ficha
-from Utils import Color
 
 
 class Juego:

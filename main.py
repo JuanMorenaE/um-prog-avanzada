@@ -5,8 +5,6 @@ import time
 
 from Opciones import mostrar_opciones
 from Juego import Juego
-from Tablero import Tablero
-from Vista import Vista
 from Utils import Color
 from Constantes import ESPERA_MODO_AUTOMATICO
 

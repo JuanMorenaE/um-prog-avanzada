@@ -1,5 +1,3 @@
-from Ficha import Ficha
-from functools import reduce
 from Constantes import CASILLA_FINAL, MAX_FICHAS
 
 class Player:
