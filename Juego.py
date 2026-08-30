@@ -5,6 +5,7 @@ from Opciones import mostrar_opciones
 from Constantes import MAX_JUGADORES
 from Vista import Vista
 from Ficha import Ficha
+from Utils import Color
 
 
 class Juego:
@@ -30,7 +31,7 @@ class Juego:
     #          JUGADORES
     # -----------------------------
 
-    def nuevo_jugador(self, name, color):
+    def nuevo_jugador(self, name: str, color: Color):
         if len(self.jugadores) >= self.max_jugadores:
             print("\n[ ERROR ] No se pueden añadir mas jugadores.")
             return
@@ -43,7 +44,7 @@ class Juego:
         return jugador
 
 
-    def obtener_jugador_por_color(self, color):
+    def obtener_jugador_por_color(self, color: Color):
         return next(filter(lambda x: x.color == color, self.jugadores), None)
 
 

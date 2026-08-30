@@ -9,6 +9,11 @@ class Color(Enum):
 
 
 def logDecorator(function):
-    start = time.time()
-    function()
-    print(f"[LOG] {function.name} tardó {time.time() - start:.4f} segundos")
+    def wrapper():
+        start = time.time()
+        result = function()
+        print(f"[LOG] {function.__name__} tardó {time.time() - start:.4f} segundos")
+
+        return result
+
+    return wrapper

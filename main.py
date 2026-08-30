@@ -5,7 +5,7 @@ import time
 
 from Opciones import mostrar_opciones
 from Juego import Juego
-from Utils import Color
+from Utils import Color, logDecorator
 from Constantes import ESPERA_MODO_AUTOMATICO
 
 juego = Juego()
@@ -20,7 +20,7 @@ def turnos():
     for player in juego.jugadores:
         yield player
 
-
+@logDecorator
 def main():
     pygame.init()
     
