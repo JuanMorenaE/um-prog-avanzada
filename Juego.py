@@ -2,8 +2,7 @@ from Tablero import Tablero, CASILLA_FINAL
 from Player import Player
 from Dados import Dados
 from Opciones import mostrar_opciones
-
-MAX_JUGADORES = 4
+from Constantes import MAX_JUGADORES
 
 class Juego:
     def __init__(self):

@@ -1,6 +1,6 @@
 import random
 
-def mostrar_opciones(opciones: dict, auto_mode: bool):
+def mostrar_opciones(opciones: dict, auto_mode: bool = False):
     opciones_lista = list(opciones.items())
 
     print()
@@ -17,7 +17,7 @@ def mostrar_opciones(opciones: dict, auto_mode: bool):
     else:
         while True:
             try:
-                opcion = int(input("Opción > "))
+                opcion = int(input("\nOpción > "))
 
                 if opcion in opciones_validas:
                     break

@@ -34,10 +34,10 @@ def main():
         print("\tJUEGO")
         print("╚════════════════════════════╝")
 
-        if tablero._players:
+        if juego.jugadores:
             print("\nJugadores:")
-            for p in tablero._players:
-                print(f"  • {p._color.name.capitalize()} - {p._name}")
+            for p in juego.jugadores:
+                print(f"  • {p.color.name.capitalize()} - {p.nombre}")
 
 
         opcion = mostrar_opciones({
@@ -45,47 +45,37 @@ def main():
             "Agregar jugador": 2
         })
 
-        opcion = input("\nSeleccione una opción [1-2] > ")
-
-        if opcion == "1":
-            if len(tablero._players) != 0:
-                print("¡A jugar!")
+        if opcion == 1:
+            if len(juego.jugadores) != 0:
+                print("\n¡A jugar!")
                 break
             else:
                 input("\nx Necesitás al menos un jugador para iniciar el juego. Presioná ENTER para continuar...")
                 continue
 
-        elif opcion == "2":
-            name = input("¿Como te llamas? > ")
+        elif opcion == 2:
+            name = input("\n¿Como te llamas? > ")
 
             print("\nColores disponibles:")
+
+            opciones = {}
             for color in Color:
-                print(f"\t• {color.name}")
+                opciones[f"{color.name}"] = color
 
-            color = input("\nElegí tu color > ").upper()
+            color = mostrar_opciones(opciones)
 
-            try:
-                color = Color[color]
-            except KeyError:
-                input(f"\nx '{color}' no es un color válido. Presioná ENTER para continuar...")
-                continue
-
-            while tablero.buscar_jugador_por_color(color) is not None:
+            while juego.obtener_jugador_por_color(color) is not None:
                 print("\n x Ese color ya esta seleccionado, elegí otro color")
 
                 print("\nColores disponibles:")
-                for color in Color:
-                    print(f"\t• {color.name}")
-        
-                color = input("\nElegí otro color > ").upper()
                 
-                try:
-                    color = Color[color]
-                except KeyError:
-                    input(f"\nx '{color}' no es un color válido...")
-                    continue
+                opciones = {}
+                for color in Color:
+                    opciones[f"{color.name}"] = color
+    
+                color = mostrar_opciones(opciones)
 
-            tablero.nuevo_jugador(name,color)
+            juego.nuevo_jugador(name, color)
             continue
 
         else:

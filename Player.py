@@ -1,6 +1,6 @@
 from Ficha import Ficha
 from functools import reduce
-from Tablero import CASILLA_FINAL
+from Constantes import CASILLA_FINAL
 
 class Player:
     def __init__(self, name, color):

@@ -2,14 +2,11 @@ from Player import Player
 from Dados import Dados
 from Utils import Color
 from Ficha import Ficha
-
-TOTAL_CASILLAS = 36
-CASILLA_FINAL = TOTAL_CASILLAS - 1
+from Constantes import TOTAL_CASILLAS, CASILLA_FINAL
 
 class Tablero:    
     def __init__(self):
         self.casillas = [[] for _ in range (TOTAL_CASILLAS)]
-        self.autoMode = False
         self.casillas_especiales = {
             5: self.efecto_P1,
             11: self.efecto_P2,
