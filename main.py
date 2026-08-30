@@ -12,6 +12,10 @@ def limpiar_consola():
 
 tablero = Tablero()
 
+def turnos():
+    for player in tablero._players:
+        yield player
+
 while True:
     limpiar_consola()
 
@@ -66,6 +70,7 @@ while True:
                 color = Color[color]
             except KeyError:
                 input(f"\nx '{color}' no es un color válido...")
+                continue
 
         tablero.nuevo_jugador(name,color)
         continue
@@ -77,7 +82,8 @@ while True:
 juego_terminado = False
 
 while not juego_terminado:
-    for player in tablero._players:
+    players = turnos()
+    for player in players:
         limpiar_consola()
 
         tablero.mostrar_tablero()
