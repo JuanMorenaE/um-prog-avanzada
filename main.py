@@ -36,18 +36,22 @@ def main():
             for p in juego.jugadores:
                 print(f"  • {nombre_color(p.color)} - {p.nombre}")
 
+        opciones = {}
 
-        opcion = mostrar_opciones({
-            "Jugar": 1,
-            "Agregar jugador": 2
-        })
+        if len(juego.jugadores) > 1:
+            opciones["Jugar"] = 1
+
+        if len(juego.jugadores) < 4:
+            opciones["Agregar jugador"] = 2
+
+        opcion = mostrar_opciones(opciones)
 
         if opcion == 1:
             if len(juego.jugadores) != 0:
                 print("\n¡A jugar!")
                 break
             else:
-                input("\nx Necesitás al menos un jugador para iniciar el juego. Presioná ENTER para continuar...")
+                input("\nx Necesitás al menos 2 jugadores para iniciar el juego. Presioná ENTER para continuar...")
                 continue
 
         elif opcion == 2:
