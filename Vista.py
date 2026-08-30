@@ -17,9 +17,10 @@ ALTO_VENTANA = FILAS * TAM_CASILLA + MARGEN * 2
 
 COLOR_FONDO = (24, 26, 32)
 COLOR_CASILLA = (238, 238, 230)
-COLOR_CASILLA_ESPECIAL = (250, 214, 137)
-COLOR_CASILLA_INICIO = (167, 226, 167)
-COLOR_CASILLA_FINAL = (226, 167, 167)
+COLOR_CASILLA_ESPECIAL_POSITIVA = (249, 203, 156)
+COLOR_CASILLA_ESPECIAL_NEGATIVA = (224, 102, 102)
+COLOR_CASILLA_INICIO = (0, 255, 0)
+COLOR_CASILLA_FINAL = (201, 218, 248)
 COLOR_BORDE = (60, 62, 70)
 COLOR_TEXTO = (40, 42, 48)
 
@@ -86,10 +87,25 @@ class Vista:
         if posicion == CASILLA_FINAL:
             return COLOR_CASILLA_FINAL
 
-        if self._juego.obtener_casilla_especial(posicion) is not None:
-            return COLOR_CASILLA_ESPECIAL
+        efecto = self._juego.obtener_casilla_especial(posicion)
+
+        if efecto is not None:
+            # Las casillas P (premio) son positivas y las C (castigo) negativas,
+            # así que se distinguen por color según el nombre del efecto.
+            if self.es_casilla_positiva(efecto):
+                return COLOR_CASILLA_ESPECIAL_POSITIVA
+
+            return COLOR_CASILLA_ESPECIAL_NEGATIVA
 
         return COLOR_CASILLA
+
+    @staticmethod
+    def es_casilla_positiva(efecto):
+        return efecto.__name__.startswith("efecto_P")
+
+    @staticmethod
+    def etiqueta_casilla(efecto):
+        return efecto.__name__.removeprefix("efecto_")
 
     def dibujar_casilla(self, posicion):
         rect = rectangulo_casilla(posicion)
@@ -97,8 +113,14 @@ class Vista:
         pygame.draw.rect(self._pantalla, self.color_de_casilla(posicion), rect, border_radius=6)
         pygame.draw.rect(self._pantalla, COLOR_BORDE, rect, width=2, border_radius=6)
 
-        numero = self._fuente_casilla.render(f"{posicion:02}", True, COLOR_TEXTO)
+        numero = self._fuente_casilla.render(f"{posicion+1:02}", True, COLOR_TEXTO)
         self._pantalla.blit(numero, (rect.x + 5, rect.y + 4))
+
+        efecto = self._juego.obtener_casilla_especial(posicion)
+
+        if efecto is not None:
+            etiqueta = self._fuente_casilla.render(self.etiqueta_casilla(efecto), True, COLOR_TEXTO)
+            self._pantalla.blit(etiqueta, (rect.right - etiqueta.get_width() - 5, rect.y + 4))
 
     def dibujar_fichas(self, posicion):
         fichas = self._tablero.casillas[posicion]
