@@ -8,6 +8,7 @@ from Juego import Juego
 from Tablero import Tablero
 from Vista import Vista
 from Utils import Color
+from Constantes import ESPERA_MODO_AUTOMATICO
 
 juego = Juego()
 
@@ -93,7 +94,7 @@ def main():
         jugadores = turnos()
         for jugador in jugadores:
             if auto_mode:
-                time.sleep(1)
+                time.sleep(ESPERA_MODO_AUTOMATICO)
 
             limpiar_consola()
             juego.vista.dibujar()

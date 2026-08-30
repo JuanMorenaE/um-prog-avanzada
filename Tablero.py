@@ -38,8 +38,8 @@ class Tablero:
 
         fichas_en_casilla = self.casillas[pos_nueva]
 
-        # No hay fichas en la nueva posicion o hay pero son del mismo color.
-        if len(fichas_en_casilla) == 0 or fichas_en_casilla[0].color == ficha.color:
+        # No hay fichas en la nueva posicion o hay pero son del mismo color o es la casilla final.
+        if len(fichas_en_casilla) == 0 or fichas_en_casilla[0].color == ficha.color or pos_nueva == CASILLA_FINAL:
             self.avanzar_ficha(ficha, pos_actual, pos_nueva)
             return
 
