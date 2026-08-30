@@ -1,5 +1,5 @@
 class Ficha:
     def __init__(self, color, posicion):
-        self._color = color
-        self._posicion = posicion
-        self._finalizo = False
+        self.color = color
+        self.posicion = posicion
+        self.finalizo = False

@@ -1,17 +1,16 @@
 from Player import Player
 from Dados import Dados
 from Utils import Color
+from Ficha import Ficha
 
 TOTAL_CASILLAS = 36
 CASILLA_FINAL = TOTAL_CASILLAS - 1
-MAX_JUGADORES = 4
 
 class Tablero:    
     def __init__(self):
-        self._casillas = [[] for _ in range (TOTAL_CASILLAS)]
-        self._max_players = MAX_JUGADORES
-        self._players = []
-        self._casillas_especiales = {
+        self.casillas = [[] for _ in range (TOTAL_CASILLAS)]
+        self.autoMode = False
+        self.casillas_especiales = {
             5: self.efecto_P1,
             11: self.efecto_P2,
             16: self.efecto_C1,
@@ -21,33 +20,24 @@ class Tablero:
 
 
     # -----------------------------
-    #          JUGADORES
-    # -----------------------------
-
-    def nuevo_jugador(self, name, color):
-        if len(self._players) >= self._max_players:
-            print("\n[ ERROR ] No se pueden añadir mas jugadores.")
-            return
-        
-        player = Player(name, color)
-        self._players.append(player)
-        
-        return player
-
-
-    def buscar_jugador_por_color(self, color):
-        return next(filter(lambda x: x._color == color, self._players), None)
-
-
-    # -----------------------------
     #          FICHAS
     # -----------------------------
 
-    def calcular_posicion(self, posicion, dado):
+    def sacar_ficha(self, jugador: Player):
+        if len(jugador.fichas) >= jugador.max_fichas:
+            return
+
+        ficha = Ficha(jugador.color, 0)
+        jugador.fichas.append(ficha)
+
+        self.casillas[0].append(ficha)
+
+
+    def calcular_posicion(self, posicion: int, dado: int):
         return min(posicion + dado, CASILLA_FINAL)
 
 
-    def mover_ficha(self, ficha, dados):
+    def mover_ficha(self, ficha: Ficha, dados: int):
         pos_actual = ficha._posicion
         pos_nueva =  self.calcular_posicion(pos_actual, dados)
 
@@ -65,13 +55,13 @@ class Tablero:
         self.competencia_por_posicion(ficha, pos_actual, pos_nueva)
 
 
-    def avanzar_ficha(self, ficha, pos_actual, pos_nueva):
+    def avanzar_ficha(self, ficha: Ficha, pos_actual: int, pos_nueva: int):
         self._casillas[pos_actual].remove(ficha)
         self._casillas[pos_nueva].append(ficha)
         ficha._posicion = pos_nueva
 
 
-    def retroceder_ficha(self, ficha, pos_actual, pos_nueva):
+    def retroceder_ficha(self, ficha: Ficha, pos_actual: int, pos_nueva: int):
         # Si llegó a la primer casilla, no importa si hay jugadores queda ahí.
         if pos_nueva <= 0:
             pos_nueva = 0
@@ -92,7 +82,7 @@ class Tablero:
         self.retroceder_ficha(ficha, pos_actual, pos_nueva - 1)
 
 
-    def competencia_por_posicion(self, ficha, pos_actual, pos_nueva):
+    def competencia_por_posicion(self, ficha: Ficha, pos_actual: int, pos_nueva: int):
         ficha_rival = self._casillas[pos_nueva][0]
 
         player_actual = self.buscar_jugador_por_color(ficha._color)
@@ -112,7 +102,7 @@ class Tablero:
             self.retroceder_ficha(ficha, pos_actual, pos_nueva - 2)
 
 
-    def competencia_dados(self, player1, player2):
+    def competencia_dados(self, player1: Player, player2: Player):
         print("\n╔════════════════════════════════════╗")
         print(f"\t⚔ COMPETENCIA ⚔")
         print(f"\t{player1._name} vs {player2._name}")
@@ -141,11 +131,11 @@ class Tablero:
     #      CASILLAS ESPECIALES
     # -----------------------------
 
-    def obtener_casilla_especial(self,posicion):
+    def obtener_casilla_especial(self, posicion: int):
         return self._casillas_especiales.get(posicion)
 
     
-    def aplicar_casilla_especial(self,ficha, player):
+    def aplicar_casilla_especial(self, ficha: Ficha, player: Player):
         efecto = self.obtener_casilla_especial(ficha._posicion)
         
         if efecto is None:
@@ -154,7 +144,7 @@ class Tablero:
         efecto(ficha, player)
     
 
-    def efecto_P1(self, ficha, player): # Elige un color para que pierda un turno
+    def efecto_P1(self, ficha: Ficha, player: Player): # Elige un color para que pierda un turno
         input("\nCaíste en la casilla P1: 'Elige un color para que pierda un turno'.")
 
         candidatos = [p for p in self._players if p != player]
@@ -185,7 +175,7 @@ class Tablero:
             return
         
 
-    def efecto_P2(self, ficha, player): # Tira el dado nuevamente y avanza
+    def efecto_P2(self, ficha: Ficha, player: Player): # Tira el dado nuevamente y avanza
         input("\nCaíste en la casilla P2: 'Tira el dado nuevamente y avanza'.")
 
         input("\nPresioná ENTER para tirar los dados...")
@@ -201,7 +191,7 @@ class Tablero:
         pass
 
 
-    def efecto_P3(self, ficha, player): # Avanza 2 casillas
+    def efecto_P3(self, ficha: Ficha, player: Player): # Avanza 2 casillas
         input("\nCaíste en la casilla P3: ' Avanza 2 casillas'.")
 
         self.mover_ficha(ficha, 2)
@@ -211,14 +201,14 @@ class Tablero:
         pass
 
 
-    def efecto_C1(self, ficha, player): #  Pierde 1 turno
+    def efecto_C1(self, ficha: Ficha, player: Player): #  Pierde 1 turno
         input("\nCaíste en la casilla C1: 'Pierde 1 turno'.")
         player._pierde_proximo_turno = True
 
         pass
 
 
-    def efecto_C2(self, ficha, player): # Retrocede 3 casillas
+    def efecto_C2(self, ficha: Ficha, player: Player): # Retrocede 3 casillas
         input("\nCaíste en la casilla C2: 'Retrocede 3 casillas'.")
 
         self.mover_ficha(ficha, -3)
@@ -226,29 +216,3 @@ class Tablero:
         input(f"\n✓ Ficha retrocede 3 posiciones.")
 
         pass
-
-
-    # -----------------------------
-    #          TABLERO
-    # -----------------------------
-
-    def mostrar_tablero(self):
-            # Esta funcion me la hizo el chat para ver momentaneamente el tablero.
-            print("─" * 50)
-
-            for i, casilla in enumerate(self._casillas):
-
-                if len(casilla) == 0:
-                    contenido = "·"
-                else:
-                    contenido = ",".join(
-                        ficha._color.name[0]
-                        for ficha in casilla
-                    )
-
-                print(f"[{i:02}] {contenido}", end="  ")
-
-                if (i + 1) % 6 == 0:
-                    print()
-
-            print("─" * 50)
