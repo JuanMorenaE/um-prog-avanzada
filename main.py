@@ -84,6 +84,8 @@ def main():
         "Juego Manual": False
     })
     juego.auto_mode = auto_mode
+    juego.tablero.auto_mode = auto_mode
+    
     print("Auto Mode: ", auto_mode)
 
     juego_terminado = False

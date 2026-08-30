@@ -1,6 +1,6 @@
 import pygame
 
-from Tablero import TOTAL_CASILLAS
+from Constantes import TOTAL_CASILLAS, CASILLA_FINAL
 from Utils import Color
 
 # El tablero es el perímetro de una grilla de 10x10:
@@ -65,10 +65,13 @@ def rectangulo_casilla(posicion):
 
 
 class Vista:
-    def __init__(self, tablero):
+    def __init__(self, juego):
         pygame.init()
 
-        self._tablero = tablero
+        # La vista necesita el juego y no solo el tablero: el tablero tiene las
+        # fichas, pero las casillas especiales las maneja Juego.
+        self._juego = juego
+        self._tablero = juego.tablero
         self._abierta = True
         self._pantalla = pygame.display.set_mode((ANCHO_VENTANA, ALTO_VENTANA))
         pygame.display.set_caption("Tablero")
@@ -80,10 +83,10 @@ class Vista:
         if posicion == 0:
             return COLOR_CASILLA_INICIO
 
-        if posicion == TOTAL_CASILLAS - 1:
+        if posicion == CASILLA_FINAL:
             return COLOR_CASILLA_FINAL
 
-        if self._tablero.obtener_casilla_especial(posicion) is not None:
+        if self._juego.obtener_casilla_especial(posicion) is not None:
             return COLOR_CASILLA_ESPECIAL
 
         return COLOR_CASILLA
@@ -139,16 +142,16 @@ class Vista:
 
 
 if __name__ == "__main__":
-    from Tablero import Tablero
+    from Juego import Juego
     from Ficha import Ficha
 
-    tablero = Tablero()
+    juego = Juego()
 
     # Fichas de ejemplo para ver el recorrido.
     for posicion, color in [(0, Color.ROJO), (5, Color.VERDE), (18, Color.AZUL), (35, Color.AMARILLO)]:
-        tablero.casillas[posicion].append(Ficha(color, posicion))
+        juego.tablero.casillas[posicion].append(Ficha(color, posicion))
 
-    vista = Vista(tablero)
+    vista = juego.vista
 
     reloj = pygame.time.Clock()
     while vista.dibujar():
