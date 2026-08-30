@@ -161,22 +161,3 @@ class Vista:
         pygame.display.flip()
 
         return True
-
-
-if __name__ == "__main__":
-    from Juego import Juego
-    from Ficha import Ficha
-
-    juego = Juego()
-
-    # Fichas de ejemplo para ver el recorrido.
-    for posicion, color in [(0, Color.ROJO), (5, Color.VERDE), (18, Color.AZUL), (35, Color.AMARILLO)]:
-        juego.tablero.casillas[posicion].append(Ficha(color, posicion))
-
-    vista = juego.vista
-
-    reloj = pygame.time.Clock()
-    while vista.dibujar():
-        reloj.tick(30)
-
-    pygame.quit()
