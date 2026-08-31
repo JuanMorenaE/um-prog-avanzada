@@ -66,6 +66,8 @@ class Juego:
             self.vista.esperar_enter("\nPresioná ENTER para tirar los dados...")
 
         dados = Dados.tirar_dados()
+        self.vista.mostrar_dado(dados)
+        self.vista.dibujar()
 
         print(f"\n\t⚁ DADO: {dados} ⚁")
 
@@ -85,6 +87,7 @@ class Juego:
  
     def sacar_ficha(self, jugador: Player):
         self.tablero.sacar_ficha(jugador)
+        self.vista.mostrar_mensaje(f"{jugador.nombre} sacó una nueva ficha")
         self.vista.dibujar()
 
 
@@ -118,6 +121,7 @@ class Juego:
         self.tablero.mover_ficha(ficha, dados, self.jugadores)
 
         print(f"\n✓ Ficha movida a la posicion {ficha.posicion}.")
+        self.vista.mostrar_mensaje(f"Ficha movida a la casilla {ficha.posicion + 1}")
 
         self.vista.dibujar()
 
