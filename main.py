@@ -95,6 +95,8 @@ def main():
     while not juego_terminado:
         jugadores = turnos()
         for jugador in jugadores:
+            juego.vista.establecer_turno(jugador)
+
             if auto_mode:
                 if not juego.vista.esperar(ESPERA_MODO_AUTOMATICO):
                     return
@@ -111,6 +113,7 @@ def main():
 
             if jugador.es_ganador():
                 print(f"\n¡{jugador.nombre} ganó la partida!")
+                juego.vista.mostrar_ganador(jugador)
                 juego_terminado = True
                 break
 

@@ -21,12 +21,16 @@ ALTO_VENTANA = FILAS * TAM_CASILLA + MARGEN * 2
 
 COLOR_FONDO = (24, 26, 32)
 COLOR_CASILLA = (238, 238, 230)
-COLOR_CASILLA_ESPECIAL_POSITIVA = (249, 203, 156)
-COLOR_CASILLA_ESPECIAL_NEGATIVA = (224, 102, 102)
-COLOR_CASILLA_INICIO = (0, 255, 0)
-COLOR_CASILLA_FINAL = (201, 218, 248)
+COLOR_CASILLA_ESPECIAL_POSITIVA = (240, 185, 95)
+COLOR_CASILLA_ESPECIAL_NEGATIVA = (205, 95, 95)
+COLOR_CASILLA_INICIO = (105, 190, 120)
+COLOR_CASILLA_FINAL = (105, 150, 220)
 COLOR_BORDE = (60, 62, 70)
 COLOR_TEXTO = (40, 42, 48)
+COLOR_PANEL = (35, 38, 46)
+COLOR_BORDE_PANEL = (78, 82, 94)
+COLOR_TEXTO_PANEL = (235, 237, 242)
+COLOR_TEXTO_SECUNDARIO = (170, 175, 188)
 
 COLORES_FICHA = {
     Color.ROJO: (214, 48, 49),
@@ -79,6 +83,12 @@ class Vista:
         self._pantalla = None
         self._fuente_casilla = None
         self._fuente_ficha = None
+        self._fuente_titulo = None
+        self._fuente_panel = None
+        self._fuente_dado = None
+        self._jugador_actual = None
+        self._ultimo_dado = None
+        self._mensaje = "Esperando el primer turno"
 
     def iniciar(self):
         if self._abierta:
@@ -91,6 +101,74 @@ class Vista:
 
         self._fuente_casilla = pygame.font.SysFont("consolas", 16)
         self._fuente_ficha = pygame.font.SysFont("consolas", 14, bold=True)
+        self._fuente_titulo = pygame.font.SysFont("consolas", 28, bold=True)
+        self._fuente_panel = pygame.font.SysFont("consolas", 20)
+        self._fuente_dado = pygame.font.SysFont("consolas", 42, bold=True)
+
+    def establecer_turno(self, jugador):
+        self._jugador_actual = jugador
+        self._ultimo_dado = None
+        self._mensaje = f"Turno de {jugador.nombre}"
+
+    def mostrar_dado(self, dado):
+        self._ultimo_dado = dado
+        self._mensaje = f"{self._jugador_actual.nombre} obtuvo {dado}"
+
+    def mostrar_mensaje(self, mensaje):
+        self._mensaje = mensaje
+
+    def mostrar_ganador(self, jugador):
+        reloj = pygame.time.Clock()
+        fuente_ganador = pygame.font.SysFont("consolas", 54, bold=True)
+        fuente_nombre = pygame.font.SysFont("consolas", 42, bold=True)
+        fuente_indicacion = pygame.font.SysFont("consolas", 18)
+        color_jugador = COLORES_FICHA[jugador.color]
+
+        while self._abierta:
+            for evento in pygame.event.get():
+                if evento.type == pygame.QUIT:
+                    self._abierta = False
+                elif evento.type == pygame.KEYDOWN and evento.key in (pygame.K_RETURN, pygame.K_ESCAPE):
+                    self._abierta = False
+
+            self._pantalla.fill(COLOR_FONDO)
+
+            # Confeti decorativo alrededor del mensaje central.
+            colores_confeti = list(COLORES_FICHA.values()) + [
+                COLOR_CASILLA_ESPECIAL_POSITIVA,
+                COLOR_TEXTO_PANEL,
+            ]
+            for indice in range(42):
+                x = (indice * 83 + 35) % ANCHO_VENTANA
+                y = (indice * 47 + 25) % ALTO_VENTANA
+                color = colores_confeti[indice % len(colores_confeti)]
+                pygame.draw.rect(self._pantalla, color, (x, y, 9, 18), border_radius=3)
+
+            panel = pygame.Rect(95, 175, ANCHO_VENTANA - 190, ALTO_VENTANA - 350)
+            pygame.draw.rect(self._pantalla, COLOR_PANEL, panel, border_radius=24)
+            pygame.draw.rect(self._pantalla, color_jugador, panel, width=5, border_radius=24)
+
+            titulo = fuente_ganador.render("¡GANADOR!", True, COLOR_CASILLA_ESPECIAL_POSITIVA)
+            nombre = fuente_nombre.render(jugador.nombre.upper(), True, color_jugador)
+            detalle = self._fuente_panel.render(
+                f"Color: {jugador.color.name}", True, COLOR_TEXTO_PANEL
+            )
+            indicacion = fuente_indicacion.render(
+                "Presioná ENTER o ESC para salir", True, COLOR_TEXTO_SECUNDARIO
+            )
+
+            self._pantalla.blit(titulo, (panel.centerx - titulo.get_width() // 2, panel.y + 55))
+            self._pantalla.blit(nombre, (panel.centerx - nombre.get_width() // 2, panel.y + 145))
+            self._pantalla.blit(detalle, (panel.centerx - detalle.get_width() // 2, panel.y + 215))
+            self._pantalla.blit(
+                indicacion,
+                (panel.centerx - indicacion.get_width() // 2, panel.bottom - 55),
+            )
+
+            pygame.display.flip()
+            reloj.tick(30)
+
+        pygame.quit()
 
     def procesar_eventos(self):
         for evento in pygame.event.get():
@@ -196,6 +274,13 @@ class Vista:
             etiqueta = self._fuente_casilla.render(self.etiqueta_casilla(efecto), True, COLOR_TEXTO)
             self._pantalla.blit(etiqueta, (rect.right - etiqueta.get_width() - 5, rect.y + 4))
 
+        if posicion == 0:
+            etiqueta = self._fuente_casilla.render("INICIO", True, COLOR_TEXTO)
+            self._pantalla.blit(etiqueta, (rect.centerx - etiqueta.get_width() // 2, rect.bottom - 20))
+        elif posicion == CASILLA_FINAL:
+            etiqueta = self._fuente_casilla.render("FIN", True, COLOR_TEXTO)
+            self._pantalla.blit(etiqueta, (rect.centerx - etiqueta.get_width() // 2, rect.bottom - 20))
+
     def dibujar_fichas(self, posicion):
         fichas = self._tablero.casillas[posicion]
 
@@ -203,7 +288,7 @@ class Vista:
             return
 
         rect = rectangulo_casilla(posicion)
-        radio = 11
+        radio = 13
         centro_x = rect.centerx
         centro_y = rect.centery + 6
 
@@ -217,6 +302,53 @@ class Vista:
             pygame.draw.circle(self._pantalla, COLORES_FICHA[ficha.color], centro, radio)
             pygame.draw.circle(self._pantalla, COLOR_BORDE, centro, radio, width=2)
 
+            inicial = self._fuente_ficha.render(ficha.color.name[0], True, (255, 255, 255))
+            self._pantalla.blit(
+                inicial,
+                (centro[0] - inicial.get_width() // 2, centro[1] - inicial.get_height() // 2),
+            )
+
+    def dibujar_panel(self):
+        panel = pygame.Rect(
+            MARGEN + TAM_CASILLA + 24,
+            MARGEN + TAM_CASILLA + 24,
+            (COLUMNAS - 2) * TAM_CASILLA - 48,
+            (FILAS - 2) * TAM_CASILLA - 48,
+        )
+
+        pygame.draw.rect(self._pantalla, COLOR_PANEL, panel, border_radius=18)
+        pygame.draw.rect(self._pantalla, COLOR_BORDE_PANEL, panel, width=2, border_radius=18)
+
+        titulo = self._fuente_titulo.render("JUEGO DE TABLERO", True, COLOR_TEXTO_PANEL)
+        self._pantalla.blit(titulo, (panel.centerx - titulo.get_width() // 2, panel.y + 32))
+
+        if self._jugador_actual is not None:
+            color = COLORES_FICHA[self._jugador_actual.color]
+            turno = self._fuente_panel.render(
+                f"Turno: {self._jugador_actual.nombre} ({self._jugador_actual.color.name})",
+                True,
+                color,
+            )
+            self._pantalla.blit(turno, (panel.centerx - turno.get_width() // 2, panel.y + 100))
+
+        dado_texto = "-" if self._ultimo_dado is None else str(self._ultimo_dado)
+        dado = self._fuente_dado.render(f"DADO: {dado_texto}", True, COLOR_TEXTO_PANEL)
+        self._pantalla.blit(dado, (panel.centerx - dado.get_width() // 2, panel.y + 155))
+
+        mensaje = self._fuente_panel.render(self._mensaje, True, COLOR_TEXTO_SECUNDARIO)
+        self._pantalla.blit(mensaje, (panel.centerx - mensaje.get_width() // 2, panel.y + 245))
+
+        leyenda_titulo = self._fuente_panel.render("CASILLAS ESPECIALES", True, COLOR_TEXTO_PANEL)
+        self._pantalla.blit(
+            leyenda_titulo,
+            (panel.centerx - leyenda_titulo.get_width() // 2, panel.bottom - 130),
+        )
+
+        premio = self._fuente_casilla.render("P1 / P2 / P3  Premio", True, COLOR_CASILLA_ESPECIAL_POSITIVA)
+        castigo = self._fuente_casilla.render("C1 / C2       Castigo", True, COLOR_CASILLA_ESPECIAL_NEGATIVA)
+        self._pantalla.blit(premio, (panel.centerx - premio.get_width() // 2, panel.bottom - 88))
+        self._pantalla.blit(castigo, (panel.centerx - castigo.get_width() // 2, panel.bottom - 58))
+
     def dibujar(self):
         if not self.procesar_eventos():
             return False
@@ -226,6 +358,8 @@ class Vista:
         for posicion in range(TOTAL_CASILLAS):
             self.dibujar_casilla(posicion)
             self.dibujar_fichas(posicion)
+
+        self.dibujar_panel()
 
         pygame.display.flip()
 
