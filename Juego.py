@@ -100,10 +100,10 @@ class Juego:
             try:
                 for index, ficha in enumerate(jugador.fichas, start=1):
                     if ficha.posicion != CASILLA_FINAL:
-                        opciones[f"Posición: {ficha.posicion}"] = index
+                        opciones[f"Posición: {ficha.posicion + 1}"] = index
                         fichas_validas.append(index)
                     else:
-                        opciones[f"Posición: {ficha.posicion} (¡Llegó a la meta!)"] = index
+                        opciones[f"Posición: {ficha.posicion + 1} (¡Llegó a la meta!)"] = index
 
                 selected_ficha = mostrar_opciones(opciones, self.auto_mode, self.vista.leer_entrada)
 
