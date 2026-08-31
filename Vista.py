@@ -1,4 +1,8 @@
+import os
 import pygame
+
+if os.name == "nt":
+    import msvcrt
 
 from Constantes import TOTAL_CASILLAS, CASILLA_FINAL
 from Utils import Color
@@ -67,18 +71,88 @@ def rectangulo_casilla(posicion):
 
 class Vista:
     def __init__(self, juego):
-        pygame.init()
-
         # La vista necesita el juego y no solo el tablero: el tablero tiene las
         # fichas, pero las casillas especiales las maneja Juego.
         self._juego = juego
         self._tablero = juego.tablero
+        self._abierta = False
+        self._pantalla = None
+        self._fuente_casilla = None
+        self._fuente_ficha = None
+
+    def iniciar(self):
+        if self._abierta:
+            return
+
+        pygame.init()
         self._abierta = True
         self._pantalla = pygame.display.set_mode((ANCHO_VENTANA, ALTO_VENTANA))
         pygame.display.set_caption("Tablero")
 
         self._fuente_casilla = pygame.font.SysFont("consolas", 16)
         self._fuente_ficha = pygame.font.SysFont("consolas", 14, bold=True)
+
+    def procesar_eventos(self):
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                self._abierta = False
+                pygame.quit()
+                return False
+
+        return self._abierta
+
+    def esperar(self, segundos):
+        inicio = pygame.time.get_ticks()
+
+        while pygame.time.get_ticks() - inicio < segundos * 1000:
+            if not self.procesar_eventos():
+                return False
+
+            pygame.time.delay(10)
+
+        return True
+
+    def leer_entrada(self, mensaje=""):
+        if os.name != "nt":
+            return input(mensaje)
+
+        print(mensaje, end="", flush=True)
+        caracteres = []
+
+        while self._abierta:
+            if not self.procesar_eventos():
+                raise SystemExit
+
+            if msvcrt.kbhit():
+                caracter = msvcrt.getwch()
+
+                if caracter == "\r":
+                    print()
+                    return "".join(caracteres)
+
+                if caracter == "\b":
+                    if caracteres:
+                        caracteres.pop()
+                        print("\b \b", end="", flush=True)
+                    continue
+
+                if caracter in ("\x00", "\xe0"):
+                    msvcrt.getwch()
+                    continue
+
+                if caracter == "\x03":
+                    raise KeyboardInterrupt
+
+                if caracter.isprintable():
+                    caracteres.append(caracter)
+                    print(caracter, end="", flush=True)
+
+            pygame.time.delay(10)
+
+        raise SystemExit
+
+    def esperar_enter(self, mensaje=""):
+        self.leer_entrada(mensaje)
 
     def color_de_casilla(self, posicion):
         if posicion == 0:
@@ -144,12 +218,7 @@ class Vista:
             pygame.draw.circle(self._pantalla, COLOR_BORDE, centro, radio, width=2)
 
     def dibujar(self):
-        # Sin esto la ventana queda "no responde" para el sistema operativo.
-        for evento in pygame.event.get():
-            if evento.type == pygame.QUIT:
-                self._abierta = False
-
-        if not self._abierta:
+        if not self.procesar_eventos():
             return False
 
         self._pantalla.fill(COLOR_FONDO)

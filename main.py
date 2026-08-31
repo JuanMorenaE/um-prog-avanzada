@@ -1,7 +1,5 @@
 import os
 import subprocess
-import pygame
-import time
 
 from Opciones import mostrar_opciones
 from Juego import Juego
@@ -22,8 +20,6 @@ def turnos():
 
 @logDecorator
 def main():
-    pygame.init()
-    
     while True:
         limpiar_consola()
 
@@ -90,6 +86,8 @@ def main():
     })
     juego.auto_mode = auto_mode
     juego.tablero.auto_mode = auto_mode
+    juego.vista.iniciar()
+    juego.vista.dibujar()
     
     print("Auto Mode: ", auto_mode)
 
@@ -98,10 +96,12 @@ def main():
         jugadores = turnos()
         for jugador in jugadores:
             if auto_mode:
-                time.sleep(ESPERA_MODO_AUTOMATICO)
+                if not juego.vista.esperar(ESPERA_MODO_AUTOMATICO):
+                    return
 
             limpiar_consola()
-            juego.vista.dibujar()
+            if not juego.vista.dibujar():
+                return
 
             print("\n╔════════════════════════════════════╗")
             print(f"\tTURNO DE {jugador.nombre.upper()} ({jugador.color.name})")

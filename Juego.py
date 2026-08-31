@@ -17,6 +17,7 @@ class Juego:
 
         self.tablero = Tablero()
         self.vista = Vista(self)
+        self.tablero.esperar_enter = self.vista.esperar_enter
 
         self.casillas_especiales = {
             5: self.efecto_P1,
@@ -56,13 +57,13 @@ class Juego:
         if jugador.pierde_proximo_turno:
             print("\nEl jugador pierde el turno...")
             if not self.auto_mode:
-                input()
+                self.vista.esperar_enter()
 
             jugador.pierde_proximo_turno = False
             return
 
         if not self.auto_mode:
-            input("\nPresioná ENTER para tirar los dados...")
+            self.vista.esperar_enter("\nPresioná ENTER para tirar los dados...")
 
         dados = Dados.tirar_dados()
 
@@ -78,7 +79,7 @@ class Juego:
         if len(jugador.fichas) != 0:
             opciones[f"Mover una ficha"] = lambda: self.mover_ficha(jugador, dados)
 
-        funcion = mostrar_opciones(opciones, self.auto_mode)
+        funcion = mostrar_opciones(opciones, self.auto_mode, self.vista.leer_entrada)
         funcion()
 
  
@@ -104,7 +105,7 @@ class Juego:
                     else:
                         opciones[f"Posición: {ficha.posicion} (¡Llegó a la meta!)"] = index
 
-                selected_ficha = mostrar_opciones(opciones, self.auto_mode)
+                selected_ficha = mostrar_opciones(opciones, self.auto_mode, self.vista.leer_entrada)
 
                 if selected_ficha in fichas_validas:
                     break
@@ -144,7 +145,7 @@ class Juego:
 
     def efecto_P1(self, ficha: Ficha, player: Player): # Elige un color para que pierda un turno
         if not self.auto_mode:
-            input("\nCaíste en la casilla P1: 'Elige un color para que pierda un turno'.")
+            self.vista.esperar_enter("\nCaíste en la casilla P1: 'Elige un color para que pierda un turno'.")
 
         candidatos = (p for p in self.jugadores if p != player)
 
@@ -154,51 +155,51 @@ class Juego:
             for candidato in candidatos:
                 opciones[f"{candidato.color.name} - {candidato.nombre}"] = candidato.color
 
-            color = mostrar_opciones(opciones, self.auto_mode)
+            color = mostrar_opciones(opciones, self.auto_mode, self.vista.leer_entrada)
 
             player_pierde_turno = next(filter(lambda p: p.color == color, self.jugadores))
             player_pierde_turno.pierde_proximo_turno = True
 
             if not self.auto_mode:
-                input(f"\nEl jugador '{player_pierde_turno.nombre}' pierde un turno.")
+                self.vista.esperar_enter(f"\nEl jugador '{player_pierde_turno.nombre}' pierde un turno.")
 
             return
         
 
     def efecto_P2(self, ficha: Ficha, player: Player): # Tira el dado nuevamente y avanza
         if not self.auto_mode:
-            input("\nCaíste en la casilla P2: 'Tira el dado nuevamente y avanza'.")
-            input("\nPresioná ENTER para tirar los dados...")
+            self.vista.esperar_enter("\nCaíste en la casilla P2: 'Tira el dado nuevamente y avanza'.")
+            self.vista.esperar_enter("\nPresioná ENTER para tirar los dados...")
 
         dados = Dados.tirar_dados()
         print(f"\n\t⚁ DADO: {dados} ⚁")
 
         self.tablero.mover_ficha(ficha, dados, self.jugadores)
         if not self.auto_mode:
-            input(f"\n✓ Ficha movida {dados} posiciones.")
+            self.vista.esperar_enter(f"\n✓ Ficha movida {dados} posiciones.")
 
 
     def efecto_P3(self, ficha: Ficha, player: Player): # Avanza 2 casillas
         if not self.auto_mode:
-            input("\nCaíste en la casilla P3: ' Avanza 2 casillas'.")
+            self.vista.esperar_enter("\nCaíste en la casilla P3: ' Avanza 2 casillas'.")
 
         self.tablero.mover_ficha(ficha, 2, self.jugadores)
 
         if not self.auto_mode:
-            input(f"\n✓ Ficha movida 2 posiciones.")
+            self.vista.esperar_enter("\n✓ Ficha movida 2 posiciones.")
 
 
     def efecto_C1(self, ficha: Ficha, player: Player): #  Pierde 1 turno
         if not self.auto_mode:
-            input("\nCaíste en la casilla C1: 'Pierde 1 turno'.")
+            self.vista.esperar_enter("\nCaíste en la casilla C1: 'Pierde 1 turno'.")
         player.pierde_proximo_turno = True
 
 
     def efecto_C2(self, ficha: Ficha, player: Player): # Retrocede 3 casillas
         if not self.auto_mode:
-            input("\nCaíste en la casilla C2: 'Retrocede 3 casillas'.")
+            self.vista.esperar_enter("\nCaíste en la casilla C2: 'Retrocede 3 casillas'.")
 
         self.tablero.mover_ficha(ficha, -3, self.jugadores)
 
         if not self.auto_mode:
-            input(f"\n✓ Ficha retrocede 3 posiciones.")
+            self.vista.esperar_enter("\n✓ Ficha retrocede 3 posiciones.")

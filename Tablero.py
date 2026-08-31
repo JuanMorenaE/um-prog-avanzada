@@ -7,6 +7,7 @@ class Tablero:
     def __init__(self):
         self.casillas = [[] for _ in range (TOTAL_CASILLAS)]
         self.auto_mode = False
+        self.esperar_enter = input
 
 
     # -----------------------------
@@ -100,25 +101,25 @@ class Tablero:
         
         while True:
             if not self.auto_mode:
-                input(f"\nTurno de {player1.nombre}, presioná ENTER para tirar los dados...")
+                self.esperar_enter(f"\nTurno de {player1.nombre}, presioná ENTER para tirar los dados...")
 
             player1_score = Dados.tirar_dados()
             print(f"\n\t⚁ DADO: {player1_score} ⚁")
 
             if not self.auto_mode:
-                input(f"\nTurno de {player2.nombre}, presioná ENTER para tirar los dados....")
+                self.esperar_enter(f"\nTurno de {player2.nombre}, presioná ENTER para tirar los dados....")
 
             player2_score = Dados.tirar_dados()
             print(f"\n\t⚁ DADO: {player2_score} ⚁")
 
             if player1_score > player2_score:
                 if not self.auto_mode:
-                    input(f"\n{player1.nombre} gana la competencia. \n{player2.nombre} retrocede 2 casillas.")
+                    self.esperar_enter(f"\n{player1.nombre} gana la competencia. \n{player2.nombre} retrocede 2 casillas.")
                 return 1
             elif player2_score > player1_score:
                 if not self.auto_mode:
-                    input(f"\n{player2.nombre} gana la competencia. \n{player1.nombre} retrocede 2 casillas.")
+                    self.esperar_enter(f"\n{player2.nombre} gana la competencia. \n{player1.nombre} retrocede 2 casillas.")
                 return 2
             else:
                 if not self.auto_mode:
-                    input("\nEmpate, se vuelve a tirar...")
+                    self.esperar_enter("\nEmpate, se vuelve a tirar...")
