@@ -1,3 +1,5 @@
+import java.util.List;
+
 public final class Config {
 
     // Valores iniciales editables. Todos los tiempos estan en milisegundos.
@@ -33,9 +35,12 @@ public final class Config {
     public static final long TLmin = 1000;
     public static final long TLmax = 2000;
 
-    // Rango de coccion de referencia; cada menu debe definir su propio rango.
-    public static final long TCmin = 2000;
-    public static final long TCmax = 5000;
+    // Menus de ejemplo con sus tiempos minimo y maximo de coccion.
+    public static final List<Menu> MENUS = List.of(
+        new Menu("Pasta", 2000, 4000),
+        new Menu("Pizza", 3000, 6000),
+        new Menu("Milanesa", 4000, 7000)
+    );
 
     // Cobrar a un cliente.
     public static final long TYmin = 500;
