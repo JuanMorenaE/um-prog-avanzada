@@ -2,12 +2,14 @@ import java.util.Random;
 
 public class Cliente implements Runnable {
     public Random random;
+    public Mesa mesa;
 
     public Cliente() {
-        random = new Random();
+        this.random = new Random();
     }
 
     public void leerMenu() {
+        System.out.println("Leyendo Menu...");
         long time = Utils.RandomBetween(random, Configuracion.TMmin, Configuracion.TMmax);
 
         try {
@@ -15,6 +17,8 @@ public class Cliente implements Runnable {
         } catch (Exception ex) {
 
         }
+
+        System.out.println("Menu leido.");
     }
 
     public void comer() {
@@ -32,22 +36,21 @@ public class Cliente implements Runnable {
 
     @Override
     public void run() {
-        // 1. Espera mesa.
+        // 1. Se sienta.
+        mesa.sentarse(this);
 
-        // 2. Se sienta.
-
-        // 3. Lee menu.
+        // 2. Lee menu.
         leerMenu();
 
-        // 4. Avisa al mozo.
+        // 3. Avisa al mozo.
 
-        // 5. Espera la comida
+        // 4. Espera la comida
 
-        // 6. Come
+        // 5. Come
         comer();
 
-        // 7. Paga
+        // 6. Paga
 
-        // 8. Se va
+        // 7. Se va
     }
 }
