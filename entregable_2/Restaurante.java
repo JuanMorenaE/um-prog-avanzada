@@ -31,7 +31,7 @@ public class Restaurante implements Runnable {
 
             Cliente cliente = new Cliente();
 
-            System.out.println("Llego un nuevo cliente en " + time + "ms!");
+            System.out.println("Llego un nuevo cliente - " + time + "ms");
 
             Mesa mesa = getMesaLibre();
             
@@ -49,7 +49,7 @@ public class Restaurante implements Runnable {
 
     public synchronized Mesa getMesaLibre() {
         for (Mesa mesa : mesas)
-            if (mesa.lugarLibre.get() != Configuracion.P)
+            if (mesa.lugarLibre.get() != Configuracion.P && !mesa.ocupada)
                 return mesa;
 
         return null;

@@ -33,4 +33,8 @@ public class Mozo implements Runnable {
     private void limpiarMesa(){
 
     }
+
+    @Override 
+    public void run() {
+    }
 }
