@@ -10,6 +10,8 @@ public class Utils {
         System.out.println();
         System.out.println();
         System.out.println();
+        System.out.println();
+        System.out.println();
 
         for (Mesa mesa : mesas) {
             System.out.print("Mesa " + mesa.numero + ": ");

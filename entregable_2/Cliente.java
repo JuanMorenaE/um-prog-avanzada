@@ -51,12 +51,10 @@ public class Cliente implements Runnable {
 
     @Override
     public void run() {
-        // 1. Se sienta.
-        mesa.sentarse(this);
-
-        // 2. Lee menu.
+        // 1. Lee menu.
         leerMenu();
 
+        // 2. Espera a que todos hayan pedido.
         this.esperando = true;
 
         // Esperamos a que toda la mesa lea el menu antes de avisar al mozo.
