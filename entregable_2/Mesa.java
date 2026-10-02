@@ -30,11 +30,13 @@ public class Mesa {
         int libre = lugarLibre.getAndDecrement() - 1;
         clientes[cliente.lugarEnMesa] = null;
 
-        System.out.println("El cliente de la mesa " + numero + " se levanto, quedan " + libre + " clientes en la mesa.");
+        // System.out.println("El cliente de la mesa " + numero + " se levanto, quedan "
+        // + libre + " clientes en la mesa.");
 
-        if (libre == 0){
+        if (libre == 0) {
             ocupada = false;
-            System.out.println("Todos los clientes de la mesa " + numero + " se levantaron, la mesa queda libre.");
+            // System.out.println("Todos los clientes de la mesa " + numero + " se
+            // levantaron, la mesa queda libre.");
         }
     }
 }

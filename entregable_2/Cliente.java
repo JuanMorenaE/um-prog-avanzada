@@ -5,13 +5,19 @@ public class Cliente implements Runnable {
     public Mesa mesa;
 
     public int lugarEnMesa;
+    public boolean mirandoMenu;
+    public boolean esperando;
+    public boolean comiendo;
+    public boolean pagando;
 
     public Cliente() {
         this.random = new Random();
     }
 
     public void leerMenu() {
-        System.out.println("Leyendo Menu...");
+        // System.out.println("Leyendo Menu...");
+        this.mirandoMenu = true;
+
         long time = Utils.RandomBetween(random, Configuracion.TMmin, Configuracion.TMmax);
 
         try {
@@ -19,12 +25,15 @@ public class Cliente implements Runnable {
         } catch (Exception ex) {
 
         }
-        
-        System.out.println("Menu leido - " + time + "ms");
+
+        // System.out.println("Menu leido - " + time + "ms");
+        this.mirandoMenu = false;
     }
 
     public void comer() {
-        System.out.println("Comiendo...");
+        // System.out.println("Comiendo...");
+        this.comiendo = true;
+
         long time = Utils.RandomBetween(random, Configuracion.TQmin, Configuracion.TQmax);
 
         try {
@@ -33,7 +42,8 @@ public class Cliente implements Runnable {
 
         }
 
-        System.out.println("Terminado de comer - " + time + "ms");
+        this.comiendo = false;
+        // System.out.println("Terminado de comer - " + time + "ms");
     }
 
     public void sentarse(Mesa mesa) {
@@ -47,18 +57,20 @@ public class Cliente implements Runnable {
         // 2. Lee menu.
         leerMenu();
 
+        this.esperando = true;
+
         // Esperamos a que toda la mesa lea el menu antes de avisar al mozo.
         try {
             mesa.barrier.await();
-        }catch (Exception ex) {
+        } catch (Exception ex) {
 
         }
-
-        System.out.println("Todos los clientes de la mesa " + mesa.numero + " leyeron el menu, avisando al mozo.");
 
         // 3. Avisa al mozo.
 
         // 4. Espera la comida
+
+        this.esperando = false;
 
         // 5. Come
         comer();
@@ -67,5 +79,18 @@ public class Cliente implements Runnable {
 
         // 7. Se va
         mesa.levantarse(this);
+    }
+
+    @Override
+    public String toString() {
+        if (this.comiendo)
+            return "C";
+        else if (this.esperando)
+            return "E";
+        else if (this.mirandoMenu)
+            return "M";
+        else if (this.pagando)
+            return "P";
+        return "S";
     }
 }

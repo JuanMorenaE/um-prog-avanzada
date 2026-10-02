@@ -29,30 +29,37 @@ public class Restaurante implements Runnable {
 
             }
 
+            Utils.printMesas(this.mesas);
+
             Cliente cliente = new Cliente();
 
-            System.out.println("Llego un nuevo cliente - " + time + "ms");
+            // System.out.println("Llego un nuevo cliente - " + time + "ms");
 
             Mesa mesa = getMesaLibre();
-            
+
             if (mesa != null) {
                 cliente.mesa = mesa;
 
-                System.out.println("Se sento en la mesa: " + mesa.numero);
-                
+                // System.out.println("Se sento en la mesa: " + mesa.numero);
+
                 Thread clienteThread = new Thread(cliente);
                 clienteThread.start();
-            } else
-                System.out.println("[!] No hay mesas disponibles.");
+            } else {
+                // System.out.println("[!] No hay mesas disponibles.");
+            }
         }
     }
 
     public synchronized Mesa getMesaLibre() {
-        for (Mesa mesa : mesas)
-            if (mesa.lugarLibre.get() != Configuracion.P && !mesa.ocupada)
-                return mesa;
+        Mesa selectedMesa = null;
 
-        return null;
+        for (Mesa mesa : mesas)
+            if (mesa.lugarLibre.get() != Configuracion.P && !mesa.ocupada) {
+                if (selectedMesa == null || mesa.lugarLibre.get() > selectedMesa.lugarLibre.get())
+                    selectedMesa = mesa;
+            }
+
+        return selectedMesa;
     }
 
     public void cerrar() {
