@@ -6,6 +6,8 @@ import clasesAuxiliares.Tarea;
 import utilsConfig.Configuracion;
 import utilsConfig.Utils;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -46,11 +48,9 @@ public class Restaurante implements Runnable {
                 Cliente cliente = new Cliente();
 
                 filaClientes.add(cliente);
-                semaphore.release();
+                Utils.log("Restaurante", "Llega el " + cliente + " (en la fila: " + filaClientes.size() + ")");
 
-                System.out.println(
-                        "Llego un nuevo cliente al restaurante, la cola es de " + filaClientes.size()
-                                + " clientes");
+                semaphore.release();
             }
         });
 
@@ -58,18 +58,21 @@ public class Restaurante implements Runnable {
             while (true) {
                 try {
                     semaphore.acquire(Configuracion.P);
+                    Utils.log("Restaurante", "Hay un grupo de " + Configuracion.P + " clientes, busca una mesa libre");
 
                     Mesa mesa = esperarMesaLibre();
 
                     if (mesa == null)
                         break;
 
-                    for (int i = 0; i < Configuracion.P; i++) {
-                        Cliente cliente = filaClientes.poll();
-                        mesa.sentarse(cliente);
-                    }
+                    List<Cliente> grupo = new LinkedList<>();
+                    for (int i = 0; i < Configuracion.P; i++)
+                        grupo.add(filaClientes.poll());
 
-                    System.out.println("Se asigno la mesa " + mesa.numero + " a " + Configuracion.P + " clientes");
+                    Utils.log("Restaurante", "Asigna la mesa " + mesa.numero + " a: " + grupo);
+
+                    for (Cliente cliente : grupo)
+                        mesa.sentarse(cliente);
 
                 } catch (InterruptedException _) {
                     Thread.currentThread().interrupt();

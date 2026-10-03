@@ -46,7 +46,7 @@ public class Mozo implements Runnable {
     }
 
     private void tomarPedido(Mesa mesa) {
-        System.out.println("Mozo " + id + " esta tomando el pedido de la mesa " + mesa.numero);
+        log("Va a tomar el pedido de la mesa " + mesa.numero);
         long time = Utils.RandomBetween(random, Configuracion.TPmin, Configuracion.TPmax);
 
         try {
@@ -63,9 +63,10 @@ public class Mozo implements Runnable {
 
         }
 
-        cocina.pedidosCocina.add(new Pedido(mesa, menus));
+        log("Envia a cocina el pedido de la mesa " + mesa.numero + ": " + nombres(menus)
+                + " (tardo " + time + "ms)");
 
-        System.out.println("Mozo " + id + " tomo el pedido de la mesa en " + time + "ms");
+        cocina.pedidosCocina.add(new Pedido(mesa, menus));
     }
 
     private void recogerPlatosCocina() {
@@ -76,6 +77,7 @@ public class Mozo implements Runnable {
             Thread.sleep(time);
 
             Mesa mesa = pedido.getMesa();
+            log("Sirve la comida en la mesa " + mesa.numero);
             mesa.comidaLista();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -83,6 +85,7 @@ public class Mozo implements Runnable {
     }
 
     private void limpiarMesa(Mesa mesa) {
+        log("Limpia la mesa " + mesa.numero);
         long time = Utils.RandomBetween(random, Configuracion.TLmin, Configuracion.TLmax);
 
         try {
@@ -90,6 +93,20 @@ public class Mozo implements Runnable {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+
+        log("Termina de limpiar la mesa " + mesa.numero + " (tardo " + time + "ms)");
+    }
+
+    private void log(String mensaje) {
+        Utils.log("Mozo " + id, mensaje);
+    }
+
+    static String nombres(List<Menu> menus) {
+        List<String> nombres = new LinkedList<>();
+        for (Menu menu : menus)
+            nombres.add(menu.getNombre());
+
+        return String.join(", ", nombres);
     }
 
     @Override

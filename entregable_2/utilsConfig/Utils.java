@@ -7,6 +7,14 @@ import clasesPrincipales.Cliente;
 import java.util.Random;
 
 public class Utils {
+    private static final long INICIO = System.currentTimeMillis();
+
+    // Imprime: [segundos desde el inicio] Actor        Mensaje
+    public static void log(String actor, String mensaje) {
+        double segundos = (System.currentTimeMillis() - INICIO) / 1000.0;
+        System.out.printf("[%6.2fs] %-12s %s%n", segundos, actor, mensaje);
+    }
+
     public static long RandomBetween(Random random, long x, long y) {
         return random.nextLong(y - x + 1) + x;
     }

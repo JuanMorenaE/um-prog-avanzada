@@ -2,6 +2,7 @@ package clasesAuxiliares;
 
 import clasesPrincipales.Cliente;
 import utilsConfig.Configuracion;
+import utilsConfig.Utils;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Phaser;
@@ -42,8 +43,10 @@ public class Mesa {
         clientes[cliente.lugarEnMesa] = null;
         lugarLibre--;
 
-        if (lugarLibre == 0)
+        if (lugarLibre == 0) {
+            log("Se fueron todos los clientes, se pide un mozo para limpiar");
             tareas.add(new Tarea(Tarea.TipoTarea.LIMPIAR_MESA, this, null));
+        }
     }
 
     public synchronized void esperarComida() {
@@ -61,6 +64,10 @@ public class Mesa {
         notifyAll();
     }
 
+    private void log(String mensaje) {
+        Utils.log("Mesa " + numero, mensaje);
+    }
+
     private Phaser crearPhaser() {
         Mesa mesa = this;
 
@@ -68,7 +75,10 @@ public class Mesa {
             @Override
             protected boolean onAdvance(int phase, int registeredParties) {
                 if (phase == 0) {
+                    mesa.log("Todos eligieron, se pide un mozo para tomar el pedido");
                     tareas.add(new Tarea(Tarea.TipoTarea.TOMAR_PEDIDO, mesa, null));
+                } else if (phase == 1) {
+                    mesa.log("Todos estan servidos, empiezan a comer");
                 }
                 return false;
             }
