@@ -1,3 +1,8 @@
+package clasesAuxiliares;
+
+import clasesPrincipales.Cliente;
+import utilsConfig.Configuracion;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Mesa {

@@ -1,3 +1,7 @@
+package clasesPrincipales;
+
+import utilsConfig.Config;
+
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Mozo implements Runnable {

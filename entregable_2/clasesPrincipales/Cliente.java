@@ -1,3 +1,9 @@
+package clasesPrincipales;
+
+import clasesAuxiliares.Mesa;
+import utilsConfig.Configuracion;
+import utilsConfig.Utils;
+
 import java.util.Random;
 
 public class Cliente implements Runnable {
