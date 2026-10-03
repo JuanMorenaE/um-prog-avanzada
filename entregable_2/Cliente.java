@@ -73,6 +73,7 @@ public class Cliente implements Runnable {
         // 4. Espera la comida
 
         this.esperando = false;
+        mesa.esperarComida();
 
         // 5. Come
         comer();
@@ -86,18 +87,5 @@ public class Cliente implements Runnable {
     public Menu getRandomMenu() {
         // TODO: Devolver un menu aleatorio entre una lista de menus predefinidos.
         return new Menu("Ejemplo", Configuracion.TCmin, Configuracion.TCmax);
-    }
-
-    @Override
-    public String toString() {
-        if (this.comiendo)
-            return "C";
-        else if (this.esperando)
-            return "E";
-        else if (this.mirandoMenu)
-            return "M";
-        else if (this.pagando)
-            return "P";
-        return "S";
     }
 }

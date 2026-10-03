@@ -5,6 +5,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class Mesa {
     public int numero;
     public boolean ocupada;
+    public boolean comidaLista;
 
     public Cliente[] clientes;
     public AtomicInteger lugarLibre;
@@ -45,5 +46,20 @@ public class Mesa {
             // System.out.println("Todos los clientes de la mesa " + numero + " se
             // levantaron, la mesa queda libre.");
         }
+    }
+
+    public synchronized void esperarComida() {
+        while (!comidaLista) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
+    public synchronized void comidaLista() {
+        comidaLista = true;
+        notifyAll();
     }
 }

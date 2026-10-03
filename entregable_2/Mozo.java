@@ -2,7 +2,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class Mozo implements Runnable {
 
@@ -43,7 +42,7 @@ public class Mozo implements Runnable {
     }
 
     private void recogerPlatosCocina() {
-        long time = Utils.RandomBetween(random, Configuracion.TPmin, Configuracion.TPmax);
+        long time = Utils.RandomBetween(random, Configuracion.TRmin, Configuracion.TRmax);
 
         try {
             Thread.sleep(time);
