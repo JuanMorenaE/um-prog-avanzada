@@ -1,3 +1,10 @@
+package clasesPrincipales;
+
+import clasesAuxiliares.Cocina;
+import clasesAuxiliares.Mesa;
+import utilsConfig.Configuracion;
+import utilsConfig.Utils;
+
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;

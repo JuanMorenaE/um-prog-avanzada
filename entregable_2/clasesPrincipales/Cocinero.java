@@ -1,3 +1,10 @@
+package clasesPrincipales;
+
+import clasesAuxiliares.Cocina;
+import clasesAuxiliares.Menu;
+import clasesAuxiliares.Pedido;
+import utilsConfig.Utils;
+
 import java.util.Random;
 
 public class Cocinero implements Runnable {
@@ -24,7 +31,7 @@ public class Cocinero implements Runnable {
     }
 
     public void cocinar(Pedido pedido) {
-        for (Menu menu : pedido.getMenus()) {
+        for (Menu menu : pedido.getPlatos()) {
             long time = Utils.RandomBetween(random, menu.getTCmin(), menu.getTCmax());
 
             try {

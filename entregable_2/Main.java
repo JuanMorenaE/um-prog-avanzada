@@ -1,3 +1,10 @@
+import clasesAuxiliares.Cocina;
+import clasesAuxiliares.Mesa;
+import clasesPrincipales.Cocinero;
+import clasesPrincipales.Mozo;
+import clasesPrincipales.Restaurante;
+import utilsConfig.Configuracion;
+
 public class Main {
     public static void main(String[] args) {
         Restaurante restaurante = new Restaurante();
@@ -6,6 +13,7 @@ public class Main {
         // Inicialización
 
         restaurante.mozos = new Mozo[Configuracion.Z];
+        restaurante.cocineros = new Cocinero[Configuracion.C];
         restaurante.cocina = new Cocina();
 
         // Cargamos Mesas

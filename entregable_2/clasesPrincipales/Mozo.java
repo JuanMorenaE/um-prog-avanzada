@@ -1,3 +1,12 @@
+package clasesPrincipales;
+
+import clasesAuxiliares.Cocina;
+import clasesAuxiliares.Menu;
+import clasesAuxiliares.Mesa;
+import clasesAuxiliares.Pedido;
+import utilsConfig.Configuracion;
+import utilsConfig.Utils;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;

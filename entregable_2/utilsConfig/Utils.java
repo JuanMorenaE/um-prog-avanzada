@@ -1,3 +1,8 @@
+package utilsConfig;
+
+import clasesAuxiliares.Mesa;
+import clasesPrincipales.Cliente;
+
 import java.util.Random;
 
 public class Utils {

@@ -1,5 +1,10 @@
-import java.util.LinkedList;
-import java.util.List;
+package clasesPrincipales;
+
+import clasesAuxiliares.Menu;
+import clasesAuxiliares.Mesa;
+import utilsConfig.Configuracion;
+import utilsConfig.Utils;
+
 import java.util.Random;
 
 public class Cliente implements Runnable {

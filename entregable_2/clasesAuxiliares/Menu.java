@@ -1,3 +1,5 @@
+package clasesAuxiliares;
+
 public final class Menu {
     private final String nombre;
     private final long TCmin;

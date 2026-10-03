@@ -1,3 +1,7 @@
+package clasesAuxiliares;
+
+import utilsConfig.Configuracion;
+
 import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
 
