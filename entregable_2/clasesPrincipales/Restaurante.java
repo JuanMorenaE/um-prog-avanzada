@@ -19,8 +19,10 @@ public class Restaurante implements Runnable {
     public static Cocina cocina = new Cocina();
     public Cocinero[] cocineros = new Cocinero[Configuracion.C];
     public Mozo[] mozos = new Mozo[Configuracion.Z];
+    public Cajero[] cajeros = new Cajero[Configuracion.Y];
 
     public ConcurrentLinkedQueue<Cliente> filaClientes = new ConcurrentLinkedQueue<>();
+    public static final LinkedBlockingQueue<Cliente> filaClientesPagar = new LinkedBlockingQueue<>();
     public static ArrayBlockingQueue<Mesa> mesasLibres = new ArrayBlockingQueue<>(Configuracion.M);
     public static LinkedBlockingQueue<Mesa> mesasPorAtender = new LinkedBlockingQueue<>(Configuracion.M);
 

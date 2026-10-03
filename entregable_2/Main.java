@@ -1,5 +1,6 @@
 import clasesAuxiliares.Mesa;
 import clasesPrincipales.Cocinero;
+import clasesPrincipales.Cajero;
 import clasesPrincipales.Mozo;
 import clasesPrincipales.Restaurante;
 import utilsConfig.Configuracion;
@@ -25,6 +26,12 @@ public class Main {
         for (int i = 0; i < Configuracion.C; i++) {
             restaurante.cocineros[i] = new Cocinero(i + 1);
             new Thread(restaurante.cocineros[i]).start();
+        }
+
+        // Cargamos Cajeros
+        for (int i = 0; i < Configuracion.Y; i++) {
+            restaurante.cajeros[i] = new Cajero(i + 1);
+            new Thread(restaurante.cajeros[i]).start();
         }
 
         // ============================

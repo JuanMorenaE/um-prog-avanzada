@@ -6,10 +6,12 @@ import utilsConfig.Configuracion;
 import utilsConfig.Utils;
 
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Cliente implements Runnable {
     private static final AtomicInteger contador = new AtomicInteger(0);
+    private final CountDownLatch pagoCompletado = new CountDownLatch(1);
 
     public final int id;
     public Random random;
@@ -64,6 +66,22 @@ public class Cliente implements Runnable {
     public void sentarse(Mesa mesa) {
     }
 
+    public void pagar() throws InterruptedException {
+        this.pagando = true;
+        log("Hace cola para pagar");
+        Restaurante.filaClientesPagar.add(this);
+        try {
+            pagoCompletado.await();
+            log("Termina de pagar");
+        } finally {
+            this.pagando = false;
+        }
+    }
+
+    void pagoRealizado() {
+        pagoCompletado.countDown();
+    }
+
     @Override
     public void run() {
         log("Se sienta en la mesa " + mesa.numero + " (lugar " + (lugarEnMesa + 1) + ")");
@@ -93,7 +111,12 @@ public class Cliente implements Runnable {
         comer();
 
         // 5. Pagar
-        // TODO: Ir a pagar.
+        try {
+            pagar();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return;
+        }
 
         // 6. Irse
         log("Se levanta de la mesa " + mesa.numero);
