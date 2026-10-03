@@ -2,6 +2,7 @@ package clasesPrincipales;
 
 import clasesAuxiliares.Cocina;
 import clasesAuxiliares.Mesa;
+import clasesAuxiliares.Tarea;
 import utilsConfig.Configuracion;
 import utilsConfig.Utils;
 
@@ -18,9 +19,11 @@ public class Restaurante implements Runnable {
     public Cocinero[] cocineros;
     public Cocina cocina;
 
-    public ConcurrentLinkedQueue<Cliente> filaClientes = new ConcurrentLinkedQueue<Cliente>();
-    public ArrayBlockingQueue<Mesa> mesasLibres = new ArrayBlockingQueue<Mesa>(Configuracion.M);
-    public LinkedBlockingQueue<Mesa> mesasPorAtender = new LinkedBlockingQueue<Mesa>(Configuracion.M);
+    public ConcurrentLinkedQueue<Cliente> filaClientes = new ConcurrentLinkedQueue<>();
+    public ArrayBlockingQueue<Mesa> mesasLibres = new ArrayBlockingQueue<>(Configuracion.M);
+    public LinkedBlockingQueue<Mesa> mesasPorAtender = new LinkedBlockingQueue<>(Configuracion.M);
+
+    public LinkedBlockingQueue<Tarea> tareas = new LinkedBlockingQueue<>();
 
     public Semaphore semaphore = new Semaphore(0);
 
