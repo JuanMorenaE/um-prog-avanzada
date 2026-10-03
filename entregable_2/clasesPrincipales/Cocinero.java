@@ -23,7 +23,12 @@ public class Cocinero implements Runnable {
         while (true) {
             try {
                 TrabajoCocina trabajo = cocina.tomarTrabajo();
-                cocinarMenu(trabajo.getMenu());
+                cocina.adquirirSartenes();
+                try {
+                    cocinarMenu(trabajo.getMenu());
+                } finally {
+                    cocina.liberarSartenes();
+                }
                 if (trabajo.getPedido().marcarPlatoTerminado()) {
                     cocina.pedidosListos.put(trabajo.getPedido());
                 }
