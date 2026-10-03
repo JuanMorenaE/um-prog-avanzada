@@ -65,7 +65,7 @@ public class Mozo implements Runnable {
         log("Envia a cocina el pedido de la mesa " + mesa.numero + ": " + nombres(menus)
                 + " (tardo " + time + "ms)");
 
-        cocina.pedidosCocina.add(new Pedido(mesa, menus));
+        cocina.agregarPedido(new Pedido(mesa, menus));
     }
 
     private void entregarComida(Pedido pedido) throws InterruptedException {

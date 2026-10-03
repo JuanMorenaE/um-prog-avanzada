@@ -2,7 +2,7 @@ package clasesPrincipales;
 
 import clasesAuxiliares.Cocina;
 import clasesAuxiliares.Menu;
-import clasesAuxiliares.Pedido;
+import clasesAuxiliares.TrabajoCocina;
 import utilsConfig.Utils;
 
 import java.util.Random;
@@ -22,33 +22,27 @@ public class Cocinero implements Runnable {
     public void run() {
         while (true) {
             try {
-                Pedido pedido = cocina.pedidosCocina.take();
-                cocinar(pedido);
+                TrabajoCocina trabajo = cocina.tomarTrabajo();
+                cocina.adquirirSartenes();
+                try {
+                    cocinarMenu(trabajo.getMenu());
+                } finally {
+                    cocina.liberarSartenes();
+                }
+                if (trabajo.getPedido().marcarPlatoTerminado()) {
+                    cocina.pedidosListos.put(trabajo.getPedido());
+                }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                return;
             }
         }
     }
 
-    public void cocinar(Pedido pedido) {
-        int mesa = pedido.getMesa().numero;
-        log("Recibe el pedido de la mesa " + mesa + ": " + Mozo.nombres(pedido.getPlatos()));
-
-        for (Menu menu : pedido.getPlatos()) {
-            long time = Utils.RandomBetween(random, menu.getTCmin(), menu.getTCmax());
-            log("Cocina '" + menu.getNombre() + "' para la mesa " + mesa + " (" + time + "ms)");
-
-            try {
-                Thread.sleep(time);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
-
-        log("Termina el pedido de la mesa " + mesa);
-    }
-
-    private void log(String mensaje) {
-        Utils.log("Cocinero " + id, mensaje);
+    // la coccion ocurre fuera del bloqueo de Cocina para q se pueda trabajar en
+    // paralelo.
+    public void cocinarMenu(Menu menu) throws InterruptedException {
+        long time = Utils.RandomBetween(random, menu.getTCmin(), menu.getTCmax());
+        Thread.sleep(time);
     }
 }
