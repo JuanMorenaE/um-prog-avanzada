@@ -5,12 +5,10 @@ import utilsConfig.Configuracion;
 import java.util.ArrayDeque;
 import java.util.Objects;
 import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 
 public class Cocina {
     private final Queue<Pedido> pedidosCocina = new ArrayDeque<>();
-    public final LinkedBlockingQueue<Pedido> pedidosListos = new LinkedBlockingQueue<>(Configuracion.M);
     private final Semaphore sartenes;
     private final Semaphore adquisicionSartenes = new Semaphore(1, true);
 

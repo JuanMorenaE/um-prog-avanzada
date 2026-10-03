@@ -21,7 +21,7 @@ public class Restaurante implements Runnable {
     public Mozo[] mozos = new Mozo[Configuracion.Z];
 
     public ConcurrentLinkedQueue<Cliente> filaClientes = new ConcurrentLinkedQueue<>();
-    public ArrayBlockingQueue<Mesa> mesasLibres = new ArrayBlockingQueue<>(Configuracion.M);
+    public static ArrayBlockingQueue<Mesa> mesasLibres = new ArrayBlockingQueue<>(Configuracion.M);
     public static LinkedBlockingQueue<Mesa> mesasPorAtender = new LinkedBlockingQueue<>(Configuracion.M);
 
     public Semaphore semaphore = new Semaphore(0);

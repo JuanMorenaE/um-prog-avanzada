@@ -95,6 +95,7 @@ public class Mozo implements Runnable {
         log("Termina de limpiar la mesa " + mesa.numero + " (tardo " + time + "ms)");
 
         mesa.ocupada = false;
+        Restaurante.mesasLibres.add(mesa);
     }
 
     private void log(String mensaje) {
