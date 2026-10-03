@@ -67,7 +67,7 @@ public class Mozo implements Runnable {
 
         }
 
-        cocina.pedidosCocina.add(new Pedido(mesa, menus));
+        cocina.agregarPedido(new Pedido(mesa, menus));
 
         System.out.println("Mozo " + id + " tomo el pedido de la mesa en " + time + "ms");
     }

@@ -2,7 +2,7 @@ package clasesPrincipales;
 
 import clasesAuxiliares.Cocina;
 import clasesAuxiliares.Menu;
-import clasesAuxiliares.Pedido;
+import clasesAuxiliares.TrabajoCocina;
 import utilsConfig.Utils;
 
 import java.util.Random;
@@ -22,23 +22,20 @@ public class Cocinero implements Runnable {
     public void run() {
         while (true) {
             try {
-                Pedido pedido = cocina.pedidosCocina.take();
-                cocinar(pedido);
+                TrabajoCocina trabajo = cocina.tomarTrabajo();
+                cocinarMenu(trabajo.getMenu());
+                if (trabajo.getPedido().marcarPlatoTerminado()) {
+                    cocina.pedidosListos.put(trabajo.getPedido());
+                }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                return;
             }
         }
     }
-
-    public void cocinar(Pedido pedido) {
-        for (Menu menu : pedido.getPlatos()) {
-            long time = Utils.RandomBetween(random, menu.getTCmin(), menu.getTCmax());
-
-            try {
-                Thread.sleep(time);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
+    // la coccion ocurre fuera del bloqueo de Cocina para q se pueda trabajar en paralelo.
+    public void cocinarMenu(Menu menu) throws InterruptedException {
+        long time = Utils.RandomBetween(random, menu.getTCmin(), menu.getTCmax());
+        Thread.sleep(time);
     }
 }
