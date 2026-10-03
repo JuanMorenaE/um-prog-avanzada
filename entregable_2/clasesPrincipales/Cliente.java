@@ -60,28 +60,28 @@ public class Cliente implements Runnable {
         // 1. Lee menu.
         leerMenu();
 
-        // 2. Espera a que todos hayan pedido.
+        // 2. Espera a que todos elijan y que el mozo tome el pedido.
         this.esperando = true;
-
-        // Esperamos a que toda la mesa lea el menu antes de avisar al mozo.
         try {
-            mesa.barrier.await();
+            mesa.phaser.arriveAndAwaitAdvance();
         } catch (Exception ex) {
 
         }
 
-        // 3. Avisa al mozo.
-
-        // 4. Espera la comida
+        // 3. Espera la comida
         this.esperando = false;
         mesa.esperarComida();
 
-        // 5. Comer
+        // 4. Esperar a que todos esten servidos para comer.
+        mesa.phaser.arriveAndAwaitAdvance();
+
+        // 4. Comer
         comer();
 
-        // 6. Pagar
+        // 5. Pagar
+        // TODO: Ir a pagar.
 
-        // 7. Se va
+        // 6. Irse
         mesa.levantarse(this);
     }
 

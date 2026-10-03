@@ -3,14 +3,10 @@ package clasesPrincipales;
 import clasesAuxiliares.*;
 import utilsConfig.Configuracion;
 import utilsConfig.Utils;
-import utilsConfig.Config;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
-
-
-import java.util.concurrent.ThreadLocalRandom;
 
 public class Mozo implements Runnable {
 
@@ -19,10 +15,10 @@ public class Mozo implements Runnable {
     public LinkedBlockingQueue<Tarea> tareas;
     public Cocina cocina;
 
-    public Mozo(int id, Cocina cocina) {
+    public Mozo(int id, Cocina cocina, LinkedBlockingQueue<Tarea> tareas) {
         this.id = id;
-        this.tareas = new LinkedBlockingQueue<>();
         this.cocina = cocina;
+        this.tareas = tareas;
         this.random = new Random();
     }
 
@@ -31,12 +27,12 @@ public class Mozo implements Runnable {
     }
 
     private void realizarTarea(Tarea tarea) {
-        
+
         switch (tarea.getTipo()) {
-            case ATENDER_MESA:
+            case TOMAR_PEDIDO:
                 tomarPedido(tarea.getMesa());
                 break;
-        
+
             case ENTREGAR_COMIDA:
                 recogerPlatosCocina();
                 break;
@@ -103,7 +99,6 @@ public class Mozo implements Runnable {
                 Tarea tarea = tareas.take();
 
                 realizarTarea(tarea);
-                
 
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();

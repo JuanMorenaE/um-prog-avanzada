@@ -3,7 +3,7 @@ package clasesAuxiliares;
 public class Tarea {
 
     public enum TipoTarea {
-        ATENDER_MESA,
+        TOMAR_PEDIDO,
         ENTREGAR_COMIDA,
         LIMPIAR_MESA
     }

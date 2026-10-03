@@ -3,9 +3,8 @@ package clasesAuxiliares;
 import clasesPrincipales.Cliente;
 import utilsConfig.Configuracion;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Phaser;
 
 public class Mesa {
     public int numero;
@@ -13,40 +12,38 @@ public class Mesa {
     public boolean comidaLista;
 
     public Cliente[] clientes;
-    public AtomicInteger lugarLibre;
-    public CyclicBarrier barrier;
+    public int lugarLibre;
+    public Phaser phaser;
+    public LinkedBlockingQueue<Tarea> tareas;
 
-    public Mesa(int numero, LinkedBlockingQueue<Mesa> mesasPorAtender) {
+    public Mesa(int numero, LinkedBlockingQueue<Mesa> mesasPorAtender, LinkedBlockingQueue<Tarea> tareas) {
         this.numero = numero;
         this.clientes = new Cliente[Configuracion.P];
-        this.lugarLibre = new AtomicInteger(0);
+        this.lugarLibre = 0;
+        this.tareas = tareas;
 
-        this.barrier = new CyclicBarrier(Configuracion.P, () -> {
-            mesasPorAtender.add(this);
-        });
+        this.phaser = crearPhaser();
     }
 
-    public void sentarse(Cliente cliente) {
-        int libre = lugarLibre.getAndIncrement();
+    public synchronized void sentarse(Cliente cliente) {
 
-        clientes[libre] = cliente;
-        cliente.lugarEnMesa = libre;
+        clientes[lugarLibre] = cliente;
+        cliente.lugarEnMesa = lugarLibre;
         cliente.mesa = this;
+        lugarLibre++;
 
-        if (libre == Configuracion.P - 1)
+        if (lugarLibre == Configuracion.P)
             ocupada = true;
 
         new Thread(cliente).start();
     }
 
-    public void levantarse(Cliente cliente) {
-        int libre = lugarLibre.getAndDecrement() - 1;
+    public synchronized void levantarse(Cliente cliente) {
         clientes[cliente.lugarEnMesa] = null;
+        lugarLibre--;
 
-        if (libre == 0) {
-            ocupada = false;
-            // TODO: Enviar a los mozos que la mesa esta libre y hay que limpiarla.
-        }
+        if (lugarLibre == 0)
+            tareas.add(new Tarea(Tarea.TipoTarea.LIMPIAR_MESA, this, null));
     }
 
     public synchronized void esperarComida() {
@@ -62,5 +59,19 @@ public class Mesa {
     public synchronized void comidaLista() {
         comidaLista = true;
         notifyAll();
+    }
+
+    private Phaser crearPhaser() {
+        Mesa mesa = this;
+
+        return new Phaser(Configuracion.P) {
+            @Override
+            protected boolean onAdvance(int phase, int registeredParties) {
+                if (phase == 0) {
+                    tareas.add(new Tarea(Tarea.TipoTarea.TOMAR_PEDIDO, mesa, null));
+                }
+                return false;
+            }
+        };
     }
 }
