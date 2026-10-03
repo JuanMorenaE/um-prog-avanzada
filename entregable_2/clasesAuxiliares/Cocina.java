@@ -15,7 +15,7 @@ public class Cocina {
     private final Semaphore adquisicionSartenes = new Semaphore(1, true);
 
     public Cocina() {
-        if (Configuracion.Q < 2) { //se marca como Dead code xq el Q es una constante, esta x si se cambia el Q
+        if (Configuracion.Q < 2) { // se marca como Dead code xq el Q es una constante, esta x si se cambia el Q
             throw new IllegalArgumentException("La cocina necesita al menos dos sartenes");
         }
         sartenes = new Semaphore(Configuracion.Q, true);

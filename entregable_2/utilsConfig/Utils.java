@@ -1,5 +1,4 @@
 package utilsConfig;
-import clasesPrincipales.*;
 
 import clasesAuxiliares.Mesa;
 import clasesPrincipales.Cliente;
@@ -9,7 +8,7 @@ import java.util.Random;
 public class Utils {
     private static final long INICIO = System.currentTimeMillis();
 
-    // Imprime: [segundos desde el inicio] Actor        Mensaje
+    // Imprime: [segundos desde el inicio] Actor Mensaje
     public static void log(String actor, String mensaje) {
         double segundos = (System.currentTimeMillis() - INICIO) / 1000.0;
         System.out.printf("[%6.2fs] %-12s %s%n", segundos, actor, mensaje);

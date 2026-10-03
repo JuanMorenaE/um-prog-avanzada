@@ -1,10 +1,10 @@
 package clasesAuxiliares;
 
 import clasesPrincipales.Cliente;
+import clasesPrincipales.Mozo;
 import utilsConfig.Configuracion;
 import utilsConfig.Utils;
 
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Phaser;
 
 public class Mesa {
@@ -15,13 +15,11 @@ public class Mesa {
     public Cliente[] clientes;
     public int lugarLibre;
     public Phaser phaser;
-    public LinkedBlockingQueue<Tarea> tareas;
 
-    public Mesa(int numero, LinkedBlockingQueue<Mesa> mesasPorAtender, LinkedBlockingQueue<Tarea> tareas) {
+    public Mesa(int numero) {
         this.numero = numero;
         this.clientes = new Cliente[Configuracion.P];
         this.lugarLibre = 0;
-        this.tareas = tareas;
 
         this.phaser = crearPhaser();
     }
@@ -45,7 +43,7 @@ public class Mesa {
 
         if (lugarLibre == 0) {
             log("Se fueron todos los clientes, se pide un mozo para limpiar");
-            tareas.add(new Tarea(Tarea.TipoTarea.LIMPIAR_MESA, this, null));
+            Mozo.tareas.add(new Tarea(Tarea.TipoTarea.LIMPIAR_MESA, this, null));
         }
     }
 
@@ -76,7 +74,7 @@ public class Mesa {
             protected boolean onAdvance(int phase, int registeredParties) {
                 if (phase == 0) {
                     mesa.log("Todos eligieron, se pide un mozo para tomar el pedido");
-                    tareas.add(new Tarea(Tarea.TipoTarea.TOMAR_PEDIDO, mesa, null));
+                    Mozo.tareas.add(new Tarea(Tarea.TipoTarea.TOMAR_PEDIDO, mesa, null));
                 } else if (phase == 1) {
                     mesa.log("Todos estan servidos, empiezan a comer");
                 }

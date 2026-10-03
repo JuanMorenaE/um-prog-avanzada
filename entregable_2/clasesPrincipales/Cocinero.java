@@ -1,6 +1,5 @@
 package clasesPrincipales;
 
-import clasesAuxiliares.Cocina;
 import clasesAuxiliares.Menu;
 import clasesAuxiliares.TrabajoCocina;
 import utilsConfig.Utils;
@@ -9,28 +8,26 @@ import java.util.Random;
 
 public class Cocinero implements Runnable {
     public int id;
-    public Cocina cocina;
 
     public Random random = new Random();
 
-    public Cocinero(int id, Cocina cocina) {
+    public Cocinero(int id) {
         this.id = id;
-        this.cocina = cocina;
     }
 
     @Override
     public void run() {
         while (true) {
             try {
-                TrabajoCocina trabajo = cocina.tomarTrabajo();
-                cocina.adquirirSartenes();
+                TrabajoCocina trabajo = Restaurante.cocina.tomarTrabajo();
+                Restaurante.cocina.adquirirSartenes();
                 try {
                     cocinarMenu(trabajo.getMenu());
                 } finally {
-                    cocina.liberarSartenes();
+                    Restaurante.cocina.liberarSartenes();
                 }
                 if (trabajo.getPedido().marcarPlatoTerminado()) {
-                    cocina.pedidosListos.put(trabajo.getPedido());
+                    Restaurante.cocina.pedidosListos.put(trabajo.getPedido());
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();

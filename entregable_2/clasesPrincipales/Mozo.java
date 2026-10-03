@@ -12,13 +12,10 @@ public class Mozo implements Runnable {
 
     private final int id;
     public Random random;
-    public final LinkedBlockingQueue<Tarea> tareas;
-    public Cocina cocina;
+    public static final LinkedBlockingQueue<Tarea> tareas = new LinkedBlockingQueue<Tarea>();
 
-    public Mozo(int id, Cocina cocina, LinkedBlockingQueue<Tarea> tareas) {
+    public Mozo(int id) {
         this.id = id;
-        this.cocina = cocina;
-        this.tareas = tareas;
         this.random = new Random();
     }
 
@@ -65,7 +62,7 @@ public class Mozo implements Runnable {
         log("Envia a cocina el pedido de la mesa " + mesa.numero + ": " + nombres(menus)
                 + " (tardo " + time + "ms)");
 
-        cocina.agregarPedido(new Pedido(mesa, menus));
+        Restaurante.cocina.agregarPedido(new Pedido(mesa, menus));
     }
 
     private void entregarComida(Pedido pedido) throws InterruptedException {

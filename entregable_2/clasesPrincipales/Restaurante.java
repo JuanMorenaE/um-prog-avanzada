@@ -2,7 +2,6 @@ package clasesPrincipales;
 
 import clasesAuxiliares.Cocina;
 import clasesAuxiliares.Mesa;
-import clasesAuxiliares.Tarea;
 import utilsConfig.Configuracion;
 import utilsConfig.Utils;
 
@@ -17,15 +16,13 @@ import java.util.concurrent.Semaphore;
 public class Restaurante implements Runnable {
     public Random random = new Random();
 
-    public Mozo[] mozos;
-    public Cocinero[] cocineros;
-    public Cocina cocina;
+    public static Cocina cocina = new Cocina();
+    public Cocinero[] cocineros = new Cocinero[Configuracion.C];
+    public Mozo[] mozos = new Mozo[Configuracion.Z];
 
     public ConcurrentLinkedQueue<Cliente> filaClientes = new ConcurrentLinkedQueue<>();
     public ArrayBlockingQueue<Mesa> mesasLibres = new ArrayBlockingQueue<>(Configuracion.M);
-    public LinkedBlockingQueue<Mesa> mesasPorAtender = new LinkedBlockingQueue<>(Configuracion.M);
-
-    public LinkedBlockingQueue<Tarea> tareas = new LinkedBlockingQueue<>();
+    public static LinkedBlockingQueue<Mesa> mesasPorAtender = new LinkedBlockingQueue<>(Configuracion.M);
 
     public Semaphore semaphore = new Semaphore(0);
 
