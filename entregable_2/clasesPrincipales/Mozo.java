@@ -84,7 +84,6 @@ public class Mozo implements Runnable {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        
     }
 
     private void limpiarMesa(Mesa mesa) {
