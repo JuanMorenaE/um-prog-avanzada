@@ -18,11 +18,11 @@ public class Main {
 
         // Cargamos Mesas
         for (int i = 0; i < Configuracion.M; i++)
-            restaurante.mesasLibres.add(new Mesa(i + 1, restaurante.mesasPorAtender));
+            restaurante.mesasLibres.add(new Mesa(i + 1, restaurante.mesasPorAtender, restaurante.tareas));
 
         // Cargamos Mozos
         for (int i = 0; i < Configuracion.Z; i++) {
-            restaurante.mozos[i] = new Mozo(i + 1, restaurante.cocina);
+            restaurante.mozos[i] = new Mozo(i + 1, restaurante.cocina, restaurante.tareas);
             new Thread(restaurante.mozos[i]).start();
         }
 
