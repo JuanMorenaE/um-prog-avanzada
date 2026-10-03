@@ -12,7 +12,7 @@ public class Mozo implements Runnable {
 
     private final int id;
     public Random random;
-    public LinkedBlockingQueue<Tarea> tareas;
+    public final LinkedBlockingQueue<Tarea> tareas;
     public Cocina cocina;
 
     public Mozo(int id, Cocina cocina, LinkedBlockingQueue<Tarea> tareas) {
@@ -26,7 +26,7 @@ public class Mozo implements Runnable {
         tareas.add(tarea);
     }
 
-    private void realizarTarea(Tarea tarea) {
+    private void realizarTarea(Tarea tarea) throws InterruptedException {
 
         switch (tarea.getTipo()) {
             case TOMAR_PEDIDO:
@@ -34,7 +34,7 @@ public class Mozo implements Runnable {
                 break;
 
             case ENTREGAR_COMIDA:
-                recogerPlatosCocina();
+                entregarComida(tarea.getPedido());
                 break;
 
             case LIMPIAR_MESA:
@@ -42,7 +42,6 @@ public class Mozo implements Runnable {
                 break;
 
         }
-
     }
 
     private void tomarPedido(Mesa mesa) {
@@ -69,19 +68,21 @@ public class Mozo implements Runnable {
         cocina.pedidosCocina.add(new Pedido(mesa, menus));
     }
 
-    private void recogerPlatosCocina() {
+    private void entregarComida(Pedido pedido) throws InterruptedException {
+        if (pedido == null)
+            throw new IllegalArgumentException("La tarea de entrega debe incluir un pedido");
+
         long time = Utils.RandomBetween(random, Configuracion.TRmin, Configuracion.TRmax);
 
         try {
-            Pedido pedido = cocina.pedidosListos.take();
             Thread.sleep(time);
-
-            Mesa mesa = pedido.getMesa();
-            log("Sirve la comida en la mesa " + mesa.numero);
-            mesa.comidaLista();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException _) {
             Thread.currentThread().interrupt();
         }
+
+        log("Entrega la comida a la mesa " + pedido.getMesa().numero);
+
+        pedido.getMesa().comidaLista();
     }
 
     private void limpiarMesa(Mesa mesa) {
@@ -95,6 +96,8 @@ public class Mozo implements Runnable {
         }
 
         log("Termina de limpiar la mesa " + mesa.numero + " (tardo " + time + "ms)");
+
+        mesa.ocupada = false;
     }
 
     private void log(String mensaje) {
@@ -111,14 +114,18 @@ public class Mozo implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
+        while (!Thread.currentThread().isInterrupted()) {
+            Tarea tarea = null;
             try {
-                Tarea tarea = tareas.take();
-
+                tarea = tareas.take();
                 realizarTarea(tarea);
 
             } catch (InterruptedException e) {
+                if (tarea != null) {
+                    agregarTarea(tarea);
+                }
                 Thread.currentThread().interrupt();
+                return;
             }
         }
     }
