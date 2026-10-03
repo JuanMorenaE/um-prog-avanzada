@@ -34,7 +34,7 @@ public class Main {
 
         try {
             Thread.sleep(Configuracion.T);
-        } catch (InterruptedException _) {
+        } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
 

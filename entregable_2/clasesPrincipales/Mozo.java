@@ -73,7 +73,7 @@ public class Mozo implements Runnable {
 
         try {
             Thread.sleep(time);
-        } catch (InterruptedException _) {
+        } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
 

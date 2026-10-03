@@ -38,7 +38,7 @@ public class Restaurante implements Runnable {
 
                 try {
                     Thread.sleep(time);
-                } catch (InterruptedException _) {
+                } catch (InterruptedException ex) {
                     Thread.currentThread().interrupt();
                 }
 
@@ -71,7 +71,7 @@ public class Restaurante implements Runnable {
                     for (Cliente cliente : grupo)
                         mesa.sentarse(cliente);
 
-                } catch (InterruptedException _) {
+                } catch (InterruptedException ex) {
                     Thread.currentThread().interrupt();
                 }
             }
