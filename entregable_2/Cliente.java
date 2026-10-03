@@ -1,8 +1,12 @@
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 public class Cliente implements Runnable {
     public Random random;
     public Mesa mesa;
+
+    public Menu menu;
 
     public int lugarEnMesa;
     public boolean mirandoMenu;
@@ -26,7 +30,7 @@ public class Cliente implements Runnable {
 
         }
 
-        // System.out.println("Menu leido - " + time + "ms");
+        menu = getRandomMenu();
         this.mirandoMenu = false;
     }
 
@@ -77,6 +81,11 @@ public class Cliente implements Runnable {
 
         // 7. Se va
         mesa.levantarse(this);
+    }
+
+    public Menu getRandomMenu() {
+        // TODO: Devolver un menu aleatorio entre una lista de menus predefinidos.
+        return new Menu("Ejemplo", Configuracion.TCmin, Configuracion.TCmax);
     }
 
     @Override

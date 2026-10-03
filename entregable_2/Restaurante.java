@@ -1,91 +1,83 @@
 import java.util.Random;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
 
 public class Restaurante implements Runnable {
-    public Random random;
-    public boolean open;
+    public Random random = new Random();
 
-    public Mesa[] mesas;
-    public LinkedBlockingQueue<Cliente> filaClientes = new LinkedBlockingQueue<Cliente>();
+    public Mozo[] mozos;
+    public Cocinero[] cocineros;
+    public Cocina cocina;
+
+    public ConcurrentLinkedQueue<Cliente> filaClientes = new ConcurrentLinkedQueue<Cliente>();
+    public ArrayBlockingQueue<Mesa> mesasLibres = new ArrayBlockingQueue<Mesa>(Configuracion.M);
+    public LinkedBlockingQueue<Mesa> mesasPorAtender = new LinkedBlockingQueue<Mesa>(Configuracion.M);
+
+    public Semaphore semaphore = new Semaphore(0);
 
     public Restaurante() {
-        this.random = new Random();
-        this.open = false;
 
-        this.mesas = new Mesa[Configuracion.M];
     }
 
     @Override
     public void run() {
-        open = true;
-
-        for (int i = 0; i < Configuracion.M; i++)
-            mesas[i] = new Mesa(i + 1);
-
-        Thread asignacionDeClietesThread = new Thread(() -> {
-            while (true) {
-                try {
-                    Cliente[] grupo = new Cliente[Configuracion.P];
-
-                    for (int i = 0; i < Configuracion.P; i++)
-                        grupo[i] = filaClientes.take();
-
-                    // TODO: Esperar por una mesa libre, en vez de simplemente consultar.
-
-                    Mesa mesa = getMesaLibre();
-
-                    for (Cliente cliente : grupo)
-                        mesa.sentarse(cliente);
-
-                } catch (InterruptedException _) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-        });
-
         Thread llegadaClientesThread = new Thread(() -> {
-            while (open) {
+            while (true) {
                 long time = Utils.RandomBetween(random, Configuracion.TPmin, Configuracion.TPmax);
 
                 try {
                     Thread.sleep(time);
                 } catch (InterruptedException _) {
-                    System.out.println("El restaurante cerro, no se aceptan mas clientes.");
                     Thread.currentThread().interrupt();
                 }
 
                 Cliente cliente = new Cliente();
+
                 filaClientes.add(cliente);
+                semaphore.release();
 
                 System.out.println(
-                        "Llego un nuevo cliente al restaurante, la cola es de " + filaClientes.size() + " clientes");
+                        "Llego un nuevo cliente al restaurante, la cola es de " + filaClientes.size()
+                                + " clientes");
             }
         });
 
-        asignacionDeClietesThread.start();
+        Thread asignacionDeClietesThread = new Thread(() -> {
+            while (true) {
+                try {
+                    semaphore.acquire(Configuracion.P);
+
+                    Mesa mesa = esperarMesaLibre();
+
+                    if (mesa == null)
+                        break;
+
+                    for (int i = 0; i < Configuracion.P; i++) {
+                        Cliente cliente = filaClientes.poll();
+                        mesa.sentarse(cliente);
+                    }
+
+                    System.out.println("Se asigno la mesa " + mesa.numero + " a " + Configuracion.P + " clientes");
+
+                } catch (InterruptedException _) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        });
+
         llegadaClientesThread.start();
+        asignacionDeClietesThread.start();
+    }
 
+    private synchronized Mesa esperarMesaLibre() {
         try {
-            Thread.sleep(Configuracion.T);
-        } catch (InterruptedException _) {
+            Mesa selectedMesa = mesasLibres.take();
+            return selectedMesa;
+        } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            return null;
         }
-
-        llegadaClientesThread.interrupt();
-    }
-
-    public synchronized Mesa getMesaLibre() {
-        Mesa selectedMesa = null;
-
-        for (Mesa mesa : mesas)
-            if (mesa.lugarLibre.get() != Configuracion.P && !mesa.ocupada
-                    && (selectedMesa == null || mesa.lugarLibre.get() > selectedMesa.lugarLibre.get()))
-                selectedMesa = mesa;
-
-        return selectedMesa;
-    }
-
-    public void cerrar() {
-        open = false;
     }
 }

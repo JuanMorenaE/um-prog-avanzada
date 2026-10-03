@@ -1,40 +1,78 @@
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Mozo implements Runnable {
 
-    private final String nombre;
+    private final int id;
+    public Random random;
 
-    public Mozo (String nombre) {
+    public LinkedBlockingQueue<Mesa> mesasPorAtender;
+    public Cocina cocina;
 
-        this.nombre = nombre;
-
+    public Mozo(int id, Cocina cocina, LinkedBlockingQueue<Mesa> mesasPorAtender) {
+        this.id = id;
+        this.mesasPorAtender = mesasPorAtender;
+        this.cocina = cocina;
+        this.random = new Random();
     }
 
-    public String getNombre(){
-        return nombre;
-    }
+    private void tomarPedido(Mesa mesa) {
+        System.out.println("Mozo " + id + " esta tomando el pedido de la mesa " + mesa.numero);
+        long time = Utils.RandomBetween(random, Configuracion.TPmin, Configuracion.TPmax);
 
-    private void tomarPedido() {
         try {
-            long tiempo = ThreadLocalRandom.current()
-                    .nextLong(Config.TZmin, Config.TZmax + 1);
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
 
-            Thread.sleep(tiempo);
+        List<Menu> menus = new LinkedList<>();
+
+        for (int i = 0; i < mesa.clientes.length; i++) {
+            Cliente cliente = mesa.clientes[i];
+            menus.add(cliente.menu);
+
+        }
+
+        cocina.pedidosCocina.add(new Pedido(mesa, menus));
+
+        System.out.println("Mozo " + id + " tomo el pedido de la mesa en " + time + "ms");
+    }
+
+    private void recogerPlatosCocina() {
+        long time = Utils.RandomBetween(random, Configuracion.TPmin, Configuracion.TPmax);
+
+        try {
+            Thread.sleep(time);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }
 
-    private void recogerPlatosCocina(){
+    private void limpiarMesa() {
+        long time = Utils.RandomBetween(random, Configuracion.TLmin, Configuracion.TLmax);
 
-
+        try {
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
-    private void limpiarMesa(){
-
-    }
-
-    @Override 
+    @Override
     public void run() {
+        while (true) {
+            try {
+                Mesa mesa = mesasPorAtender.take();
+
+                tomarPedido(mesa);
+
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 }
