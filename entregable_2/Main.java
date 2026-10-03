@@ -13,7 +13,7 @@ public class Main {
 
         // Cargamos Mesas
         for (int i = 0; i < Configuracion.M; i++)
-            restaurante.mesasLibres.add(new Mesa(i + 1));
+            Restaurante.mesasLibres.add(new Mesa(i + 1));
 
         // Cargamos Mozos
         for (int i = 0; i < Configuracion.Z; i++) {
