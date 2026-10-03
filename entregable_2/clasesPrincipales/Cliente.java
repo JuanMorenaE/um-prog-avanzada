@@ -24,7 +24,6 @@ public class Cliente implements Runnable {
     }
 
     public void leerMenu() {
-        // System.out.println("Leyendo Menu...");
         this.mirandoMenu = true;
 
         long time = Utils.RandomBetween(random, Configuracion.TMmin, Configuracion.TMmax);
@@ -40,7 +39,6 @@ public class Cliente implements Runnable {
     }
 
     public void comer() {
-        // System.out.println("Comiendo...");
         this.comiendo = true;
 
         long time = Utils.RandomBetween(random, Configuracion.TQmin, Configuracion.TQmax);
@@ -52,7 +50,6 @@ public class Cliente implements Runnable {
         }
 
         this.comiendo = false;
-        // System.out.println("Terminado de comer - " + time + "ms");
     }
 
     public void sentarse(Mesa mesa) {
@@ -76,21 +73,19 @@ public class Cliente implements Runnable {
         // 3. Avisa al mozo.
 
         // 4. Espera la comida
-
         this.esperando = false;
         mesa.esperarComida();
 
-        // 5. Come
+        // 5. Comer
         comer();
 
-        // 6. Paga
+        // 6. Pagar
 
         // 7. Se va
         mesa.levantarse(this);
     }
 
     public Menu getRandomMenu() {
-        // TODO: Devolver un menu aleatorio entre una lista de menus predefinidos.
-        return new Menu("Ejemplo", Configuracion.TCmin, Configuracion.TCmax);
+        return Configuracion.menus.get(random.nextInt(Configuracion.menus.size()));
     }
 }

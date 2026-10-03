@@ -1,5 +1,9 @@
 package utilsConfig;
 
+import java.util.List;
+
+import clasesAuxiliares.Menu;
+
 public final class Configuracion {
 
     // Valores iniciales editables. Todos los tiempos estan en milisegundos.
@@ -47,6 +51,15 @@ public final class Configuracion {
     public static final int Q = 4; // Cantidad de sartenes (al menos 2).
     public static final long TWmin = 1_000; // Llegadas de clientes para llevar.
     public static final long TWmax = 3_000;
+
+    public static final List<Menu> menus = List.of(
+            new Menu("Papas con cheddar", 500, 1500),
+            new Menu("Hamburguesa clásica", 1000, 2000),
+            new Menu("Chivito", 1500, 3000),
+            new Menu("Pizza muzzarella", 1800, 3500),
+            new Menu("Pasta carbonara", 2000, 4000),
+            new Menu("Milanesa con papas", 2500, 4500),
+            new Menu("Parrillada", 3500, 5500));
 
     public Configuracion() {
     }
