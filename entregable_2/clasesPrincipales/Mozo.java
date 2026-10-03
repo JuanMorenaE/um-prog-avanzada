@@ -3,25 +3,22 @@ package clasesPrincipales;
 import clasesAuxiliares.*;
 import utilsConfig.Configuracion;
 import utilsConfig.Utils;
-import utilsConfig.Config;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
 
 
-import java.util.concurrent.ThreadLocalRandom;
 
 public class Mozo implements Runnable {
 
     private final int id;
     public Random random;
-    public LinkedBlockingQueue<Tarea> tareas;
+    public static final LinkedBlockingQueue<Tarea> tareas = new LinkedBlockingQueue<>();
     public Cocina cocina;
 
     public Mozo(int id, Cocina cocina) {
         this.id = id;
-        this.tareas = new LinkedBlockingQueue<>();
         this.cocina = cocina;
         this.random = new Random();
     }
@@ -30,7 +27,7 @@ public class Mozo implements Runnable {
         tareas.add(tarea);
     }
 
-    private void realizarTarea(Tarea tarea) {
+    private void realizarTarea(Tarea tarea) throws InterruptedException {
         
         switch (tarea.getTipo()) {
             case ATENDER_MESA:
@@ -38,7 +35,7 @@ public class Mozo implements Runnable {
                 break;
         
             case ENTREGAR_COMIDA:
-                recogerPlatosCocina();
+                entregarComida(tarea.getPedido());
                 break;
 
             case LIMPIAR_MESA:
@@ -46,18 +43,12 @@ public class Mozo implements Runnable {
                 break;
 
         }
-
     }
 
-    private void tomarPedido(Mesa mesa) {
+    private void tomarPedido(Mesa mesa) throws InterruptedException {
         System.out.println("Mozo " + id + " esta tomando el pedido de la mesa " + mesa.numero);
-        long time = Utils.RandomBetween(random, Configuracion.TPmin, Configuracion.TPmax);
-
-        try {
-            Thread.sleep(time);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        long time = Utils.RandomBetween(random, Configuracion.TZmin, Configuracion.TZmax);
+        Thread.sleep(time);
 
         List<Menu> menus = new LinkedList<>();
 
@@ -67,46 +58,42 @@ public class Mozo implements Runnable {
 
         }
 
-        cocina.pedidosCocina.add(new Pedido(mesa, menus));
+        cocina.pedidosCocina.put(new Pedido(mesa, menus));
 
         System.out.println("Mozo " + id + " tomo el pedido de la mesa en " + time + "ms");
     }
 
-    private void recogerPlatosCocina() {
-        long time = Utils.RandomBetween(random, Configuracion.TRmin, Configuracion.TRmax);
-
-        try {
-            Pedido pedido = cocina.pedidosListos.take();
-            Thread.sleep(time);
-
-            Mesa mesa = pedido.getMesa();
-            mesa.comidaLista();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+    private void entregarComida(Pedido pedido) throws InterruptedException {
+        if (pedido == null) {
+            throw new IllegalArgumentException("La tarea de entrega debe incluir un pedido");
         }
+        long time = Utils.RandomBetween(random, Configuracion.TRmin, Configuracion.TRmax);
+        Thread.sleep(time);
+        pedido.getMesa().comidaLista();
     }
 
-    private void limpiarMesa(Mesa mesa) {
+    private void limpiarMesa(Mesa mesa) throws InterruptedException {
         long time = Utils.RandomBetween(random, Configuracion.TLmin, Configuracion.TLmax);
 
-        try {
-            Thread.sleep(time);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        Thread.sleep(time);
+        mesa.ocupada = false;
     }
 
     @Override
     public void run() {
-        while (true) {
+        while (!Thread.currentThread().isInterrupted()) {
+            Tarea tarea = null;
             try {
-                Tarea tarea = tareas.take();
-
+                tarea = tareas.take();
                 realizarTarea(tarea);
                 
 
             } catch (InterruptedException e) {
+                if (tarea != null) {
+                    agregarTarea(tarea);
+                }
                 Thread.currentThread().interrupt();
+                return;
             }
         }
     }

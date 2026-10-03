@@ -22,7 +22,7 @@ public class Main {
 
         // Cargamos Mozos
         for (int i = 0; i < Configuracion.Z; i++) {
-            restaurante.mozos[i] = new Mozo(i + 1, restaurante.cocina, restaurante.mesasPorAtender);
+            restaurante.mozos[i] = new Mozo(i + 1, restaurante.cocina);
             new Thread(restaurante.mozos[i]).start();
         }
 
