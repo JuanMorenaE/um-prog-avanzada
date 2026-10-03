@@ -5,63 +5,85 @@ import utilsConfig.Configuracion;
 import utilsConfig.Utils;
 
 import java.util.Random;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
 
 public class Restaurante implements Runnable {
-    public Random random;
-    public boolean open;
+    public Random random = new Random();
 
-    public Mesa[] mesas;
+    public Mozo[] mozos;
+    public Cocinero[] cocineros;
+    public Cocina cocina;
+
+    public ConcurrentLinkedQueue<Cliente> filaClientes = new ConcurrentLinkedQueue<Cliente>();
+    public ArrayBlockingQueue<Mesa> mesasLibres = new ArrayBlockingQueue<Mesa>(Configuracion.M);
+    public LinkedBlockingQueue<Mesa> mesasPorAtender = new LinkedBlockingQueue<Mesa>(Configuracion.M);
+
+    public Semaphore semaphore = new Semaphore(0);
 
     public Restaurante() {
-        this.random = new Random();
-        this.open = false;
 
-        this.mesas = new Mesa[Configuracion.M];
     }
 
     @Override
     public void run() {
-        open = true;
+        Thread llegadaClientesThread = new Thread(() -> {
+            while (true) {
+                long time = Utils.RandomBetween(random, Configuracion.TPmin, Configuracion.TPmax);
 
-        for (int i = 0; i < Configuracion.M; i++)
-            mesas[i] = new Mesa(i + 1);
+                try {
+                    Thread.sleep(time);
+                } catch (InterruptedException _) {
+                    Thread.currentThread().interrupt();
+                }
 
-        while (open) {
-            long time = Utils.RandomBetween(random, Configuracion.TPmin, Configuracion.TPmax);
+                Cliente cliente = new Cliente();
 
-            try {
-                Thread.sleep(time);
-            } catch (Exception ex) {
+                filaClientes.add(cliente);
+                semaphore.release();
 
+                System.out.println(
+                        "Llego un nuevo cliente al restaurante, la cola es de " + filaClientes.size()
+                                + " clientes");
             }
+        });
 
-            Cliente cliente = new Cliente();
+        Thread asignacionDeClietesThread = new Thread(() -> {
+            while (true) {
+                try {
+                    semaphore.acquire(Configuracion.P);
 
-            System.out.println("Llego un nuevo cliente en " + time + "ms!");
+                    Mesa mesa = esperarMesaLibre();
 
-            Mesa mesa = getMesaLibre();
-            
-            if (mesa != null) {
-                cliente.mesa = mesa;
+                    if (mesa == null)
+                        break;
 
-                System.out.println("Se sento en la mesa: " + mesa.numero);
-                
-                Thread clienteThread = new Thread(cliente);
-                clienteThread.start();
-            } else
-                System.out.println("[!] No hay mesas disponibles.");
+                    for (int i = 0; i < Configuracion.P; i++) {
+                        Cliente cliente = filaClientes.poll();
+                        mesa.sentarse(cliente);
+                    }
+
+                    System.out.println("Se asigno la mesa " + mesa.numero + " a " + Configuracion.P + " clientes");
+
+                } catch (InterruptedException _) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        });
+
+        llegadaClientesThread.start();
+        asignacionDeClietesThread.start();
+    }
+
+    private synchronized Mesa esperarMesaLibre() {
+        try {
+            Mesa selectedMesa = mesasLibres.take();
+            return selectedMesa;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return null;
         }
-    }
-
-    public synchronized Mesa getMesaLibre() {
-        for (Mesa mesa : mesas)
-            if (mesa.lugarLibre.get() != Configuracion.P)
-                return mesa;
-
-        return null;
-    }
-
-    public void cerrar() {
-        open = false;
     }
 }

@@ -6,7 +6,7 @@ public final class Menu {
     private final long TCmax;
 
     public Menu(String nombre, long TCmin, long TCmax) {
-        
+
         this.nombre = nombre;
         this.TCmin = TCmin;
         this.TCmax = TCmax;

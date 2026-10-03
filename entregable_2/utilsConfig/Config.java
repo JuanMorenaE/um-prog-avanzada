@@ -7,7 +7,7 @@ import java.util.List;
 public final class Config {
 
     // Valores iniciales editables. Todos los tiempos estan en milisegundos.
-    public static final long T = 60_000; // Duracion de la simulacion.
+    public static final long T = 10_000; // Duracion de la simulacion.
 
     public static final int M = 5; // Cantidad de mesas.
     public static final int P = 4; // Personas por mesa.
