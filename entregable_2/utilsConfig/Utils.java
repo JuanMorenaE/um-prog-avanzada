@@ -1,4 +1,5 @@
 package utilsConfig;
+import clasesPrincipales.*;
 
 import clasesAuxiliares.Mesa;
 import clasesPrincipales.Cliente;

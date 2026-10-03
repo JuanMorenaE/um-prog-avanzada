@@ -4,13 +4,9 @@ import java.util.List;
 import java.util.Objects;
 
 public class Pedido {
-    public enum Estado {
-        CREADO, TOMADO, EN_PREPARACION, LISTO, ENTREGADO
-    }
 
     private final Mesa mesa;
     private final List<Menu> platos;
-    private Estado estado = Estado.CREADO;
 
     public Pedido(Mesa mesa, List<Menu> platos) {
         this.mesa = mesa;
@@ -28,12 +24,4 @@ public class Pedido {
         return platos;
     }
 
-    public synchronized Estado getEstado() {
-        return estado;
-    }
-
-    public synchronized void cambiarEstado(Estado nuevoEstado) {
-        Objects.requireNonNull(nuevoEstado);
-        estado = nuevoEstado;
-    }
 }

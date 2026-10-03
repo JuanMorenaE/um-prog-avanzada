@@ -1,30 +1,52 @@
 package clasesPrincipales;
 
-import clasesAuxiliares.Cocina;
-import clasesAuxiliares.Menu;
-import clasesAuxiliares.Mesa;
-import clasesAuxiliares.Pedido;
+import clasesAuxiliares.*;
 import utilsConfig.Configuracion;
 import utilsConfig.Utils;
-
+import utilsConfig.Config;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
 
+
+import java.util.concurrent.ThreadLocalRandom;
+
 public class Mozo implements Runnable {
 
     private final int id;
     public Random random;
-
-    public LinkedBlockingQueue<Mesa> mesasPorAtender;
+    public LinkedBlockingQueue<Tarea> tareas;
     public Cocina cocina;
 
-    public Mozo(int id, Cocina cocina, LinkedBlockingQueue<Mesa> mesasPorAtender) {
+    public Mozo(int id, Cocina cocina) {
         this.id = id;
-        this.mesasPorAtender = mesasPorAtender;
+        this.tareas = new LinkedBlockingQueue<>();
         this.cocina = cocina;
         this.random = new Random();
+    }
+
+    public void agregarTarea(Tarea tarea) {
+        tareas.add(tarea);
+    }
+
+    private void realizarTarea(Tarea tarea) {
+        
+        switch (tarea.getTipo()) {
+            case ATENDER_MESA:
+                tomarPedido(tarea.getMesa());
+                break;
+        
+            case ENTREGAR_COMIDA:
+                recogerPlatosCocina();
+                break;
+
+            case LIMPIAR_MESA:
+                limpiarMesa(tarea.getMesa());
+                break;
+
+        }
+
     }
 
     private void tomarPedido(Mesa mesa) {
@@ -54,13 +76,18 @@ public class Mozo implements Runnable {
         long time = Utils.RandomBetween(random, Configuracion.TRmin, Configuracion.TRmax);
 
         try {
+            Pedido pedido = cocina.pedidosListos.take();
             Thread.sleep(time);
+
+            Mesa mesa = pedido.getMesa();
+            mesa.comidaLista();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+        
     }
 
-    private void limpiarMesa() {
+    private void limpiarMesa(Mesa mesa) {
         long time = Utils.RandomBetween(random, Configuracion.TLmin, Configuracion.TLmax);
 
         try {
@@ -74,9 +101,10 @@ public class Mozo implements Runnable {
     public void run() {
         while (true) {
             try {
-                Mesa mesa = mesasPorAtender.take();
+                Tarea tarea = tareas.take();
 
-                tomarPedido(mesa);
+                realizarTarea(tarea);
+                
 
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
