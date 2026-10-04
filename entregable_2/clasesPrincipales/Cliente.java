@@ -97,6 +97,7 @@ public class Cliente implements Runnable {
 
             if (mesa.phaser.isTerminated()) {
                 log("Se va sin pedir porque cerro el restaurante");
+                Restaurante.clienteDejaDeEsperarComida();
                 mesa.levantarse(this);
                 return;
             }
@@ -112,6 +113,7 @@ public class Cliente implements Runnable {
         log("Espera la comida");
         mesa.esperarComida();
         log("Recibe la comida");
+        Restaurante.clienteDejaDeEsperarComida();
 
         // 4. Esperar a que todos esten servidos para comer.
         mesa.phaser.arriveAndAwaitAdvance();

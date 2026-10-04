@@ -9,6 +9,7 @@ import java.util.concurrent.Semaphore;
 
 public class Cocina {
     private final Queue<Pedido> pedidosCocina = new ArrayDeque<>();
+    private final Queue<Pedido> pedidosTakeAway = new ArrayDeque<>();
     private final Semaphore sartenes;
     private final Semaphore adquisicionSartenes = new Semaphore(1, true);
 
@@ -43,20 +44,26 @@ public class Cocina {
     }
 
     public synchronized void agregarPedido(Pedido pedido) {
-        pedidosCocina.add(Objects.requireNonNull(pedido));
+        Objects.requireNonNull(pedido);
+        if (pedido.getTipo() == Pedido.Tipo.TAKE_AWAY) {
+            pedidosTakeAway.add(pedido);
+        } else {
+            pedidosCocina.add(pedido);
+        }
         notifyAll();
     }
 
     public synchronized TrabajoCocina tomarTrabajo() throws InterruptedException {
         while (true) {
-            while (pedidosCocina.isEmpty()) {
+            while (pedidosCocina.isEmpty() && pedidosTakeAway.isEmpty()) {
                 wait();
             }
 
-            Pedido pedido = pedidosCocina.peek();
+            Queue<Pedido> cola = pedidosTakeAway.isEmpty() ? pedidosCocina : pedidosTakeAway;
+            Pedido pedido = cola.peek();
             Menu menu = pedido.tomarPlatoPendiente();
             if (!pedido.hayPlatosPendientes()) {
-                pedidosCocina.remove();
+                cola.remove();
             }
             if (menu != null) {
                 return new TrabajoCocina(pedido, menu);

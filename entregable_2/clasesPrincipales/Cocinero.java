@@ -1,6 +1,7 @@
 package clasesPrincipales;
 
 import clasesAuxiliares.Menu;
+import clasesAuxiliares.Pedido;
 import clasesAuxiliares.Tarea;
 import clasesAuxiliares.TrabajoCocina;
 import utilsConfig.Utils;
@@ -21,8 +22,11 @@ public class Cocinero implements Runnable {
         while (true) {
             try {
                 TrabajoCocina trabajo = Restaurante.cocina.tomarTrabajo();
-                int mesa = trabajo.getPedido().getMesa().numero;
-                log("Toma '" + trabajo.getMenu().getNombre() + "' del pedido de la mesa " + mesa
+                Pedido pedido = trabajo.getPedido();
+                String destino = pedido.getTipo() == Pedido.Tipo.MESA
+                        ? "la mesa " + pedido.getMesa().numero
+                        : pedido.getClienteTakeAway().toString();
+                log("Toma '" + trabajo.getMenu().getNombre() + "' del pedido de " + destino
                         + ", espera 2 sartenes");
 
                 Restaurante.cocina.adquirirSartenes();
@@ -31,13 +35,18 @@ public class Cocinero implements Runnable {
                 } finally {
                     Restaurante.cocina.liberarSartenes();
                 }
-                log("Termina '" + trabajo.getMenu().getNombre() + "' de la mesa " + mesa + " y libera las sartenes");
+                log("Termina '" + trabajo.getMenu().getNombre() + "' de " + destino + " y libera las sartenes");
 
                 if (trabajo.getPedido().marcarPlatoTerminado()) {
-                    log("El pedido de la mesa " + mesa + " esta completo, queda listo para servir");
-                    Mozo.tareas.add(new Tarea(Tarea.TipoTarea.ENTREGAR_COMIDA, null, trabajo.getPedido()));
+                    log("El pedido de " + destino + " esta completo, queda listo para entregar");
+                    if (pedido.getTipo() == Pedido.Tipo.TAKE_AWAY) {
+                        EmpleadoTakeAway.agregarPedidoListo(pedido);
+                    } else {
+                        Mozo.tareas.add(new Tarea(Tarea.TipoTarea.ENTREGAR_COMIDA, null, pedido));
+                    }
                 }
             } catch (InterruptedException e) {
+                log("Termina su turno");
                 Thread.currentThread().interrupt();
                 return;
             }

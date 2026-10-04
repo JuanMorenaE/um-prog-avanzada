@@ -35,6 +35,7 @@ public class Mesa {
         if (lugarLibre == Configuracion.P)
             ocupada = true;
 
+        Restaurante.clienteEsperaComida();
         new Thread(cliente).start();
     }
 

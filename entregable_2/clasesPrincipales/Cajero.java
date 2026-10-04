@@ -27,6 +27,7 @@ public class Cajero implements Runnable {
             } catch (InterruptedException e) {
                 if (cliente != null)
                     Restaurante.filaClientesPagar.add(cliente);
+                Utils.log("Cajero " + id, "Termina su turno");
                 Thread.currentThread().interrupt();
                 return;
             }
