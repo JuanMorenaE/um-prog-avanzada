@@ -18,15 +18,17 @@ public class Cajero implements Runnable {
         while (!Thread.currentThread().isInterrupted()) {
             Cliente cliente = null;
             try {
-                cliente = Restaurante.filaClientesPagar.take();
+                Utils.log("Cajero " + id, "Esperando clientes para cobrar");
+                cliente = Utils.retirar(Restaurante.filaClientesPagar, "Caja", "Cajero " + id + " toma un cliente");
                 long tiempo = Utils.RandomBetween(random, Configuracion.TYmin, Configuracion.TYmax);
                 Utils.log("Cajero " + id, "Cobra a " + cliente + " el menu '" + cliente.menu.getNombre() + "'");
                 Thread.sleep(tiempo);
                 Utils.log("Cajero " + id, "Termina de cobrar a " + cliente + " (tardo " + tiempo + "ms)");
                 cliente.pagoRealizado();
             } catch (InterruptedException e) {
-                if (cliente != null)
-                    Restaurante.filaClientesPagar.add(cliente);
+                if (cliente != null) {
+                    Utils.encolar(Restaurante.filaClientesPagar, cliente, "Caja", "Se devuelve un cobro pendiente");
+                }
                 Utils.log("Cajero " + id, "Termina su turno");
                 Thread.currentThread().interrupt();
                 return;

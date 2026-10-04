@@ -36,16 +36,18 @@ public class Mesa {
             ocupada = true;
 
         Restaurante.clienteEsperaComida();
+        log("Se sienta " + cliente);
         new Thread(cliente).start();
     }
 
     public synchronized void levantarse(Cliente cliente) {
         clientes[cliente.lugarEnMesa] = null;
         lugarLibre--;
+        log("Se retira " + cliente);
 
         if (lugarLibre == 0) {
             log("Se fueron todos los clientes, se pide un mozo para limpiar");
-            Mozo.tareas.add(new Tarea(Tarea.TipoTarea.LIMPIAR_MESA, this, null));
+            Mozo.agregarTarea(new Tarea(Tarea.TipoTarea.LIMPIAR_MESA, this, null));
         }
     }
 
@@ -61,11 +63,22 @@ public class Mesa {
 
     public synchronized void comidaLista() {
         comidaLista = true;
+        log("La comida fue servida");
         notifyAll();
     }
 
-    private void log(String mensaje) {
-        Utils.log("Mesa " + numero, mensaje);
+    private synchronized void log(String mensaje) {
+        StringBuilder estado = new StringBuilder(comidaLista ? "Comida servida" : "Esperando comida");
+        estado.append(" | Clientes: ");
+        for (Cliente cliente : clientes) {
+            if (cliente != null) {
+                estado.append(cliente).append("; ");
+            }
+        }
+        if (lugarLibre == 0) {
+            estado = new StringBuilder("Sin clientes, pendiente de limpieza");
+        }
+        Restaurante.estadoDisplay.actualizarMesa(numero, estado.toString(), mensaje);
     }
 
     private Phaser crearPhaser() {
@@ -81,7 +94,7 @@ public class Mesa {
                     }
 
                     mesa.log("Todos eligieron, se pide un mozo para tomar el pedido");
-                    Mozo.tareas.add(new Tarea(Tarea.TipoTarea.TOMAR_PEDIDO, mesa, null));
+                    Mozo.agregarTarea(new Tarea(Tarea.TipoTarea.TOMAR_PEDIDO, mesa, null));
                 } else if (phase == 1) {
                     mesa.log("Todos estan servidos, empiezan a comer");
                 }

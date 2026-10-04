@@ -69,7 +69,7 @@ public class Cliente implements Runnable {
     public void pagar() throws InterruptedException {
         this.pagando = true;
         log("Hace cola para pagar");
-        Restaurante.filaClientesPagar.add(this);
+        Utils.encolar(Restaurante.filaClientesPagar, this, "Caja", "Se encola " + this + " para pagar");
         try {
             pagoCompletado.await();
             log("Termina de pagar");
@@ -79,6 +79,7 @@ public class Cliente implements Runnable {
     }
 
     void pagoRealizado() {
+        log("Pago completado");
         pagoCompletado.countDown();
     }
 

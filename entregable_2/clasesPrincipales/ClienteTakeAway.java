@@ -38,12 +38,14 @@ public class ClienteTakeAway implements Runnable {
             return false;
         }
         estado = Estado.ACEPTADO;
+        log("Pedido aceptado, espera el cobro y la entrega");
         return true;
     }
 
     synchronized void cancelarSinPedido() {
         if (estado == Estado.ESPERANDO) {
             estado = Estado.CANCELADO;
+            log("Pedido cancelado, se retira sin pedir");
             atencionFinalizada.countDown();
         }
     }
@@ -53,6 +55,7 @@ public class ClienteTakeAway implements Runnable {
             throw new IllegalStateException("Solo se puede entregar un pedido aceptado");
         }
         estado = Estado.ENTREGADO;
+        log("Pedido entregado");
         atencionFinalizada.countDown();
     }
 

@@ -1,6 +1,7 @@
 package clasesAuxiliares;
 
 import utilsConfig.Configuracion;
+import clasesPrincipales.Restaurante;
 
 import java.util.ArrayDeque;
 import java.util.Objects;
@@ -50,6 +51,7 @@ public class Cocina {
         } else {
             pedidosCocina.add(pedido);
         }
+        informarColas("Nuevo pedido en cocina");
         notifyAll();
     }
 
@@ -66,8 +68,15 @@ public class Cocina {
                 cola.remove();
             }
             if (menu != null) {
+                informarColas("Se asigna un plato a un cocinero");
                 return new TrabajoCocina(pedido, menu);
             }
         }
+    }
+
+    private void informarColas(String mensaje) {
+        Restaurante.estadoDisplay.registrarCambio("Cocina", "Asignando platos",
+                java.util.Map.of(), java.util.Map.of("Pedidos de mesas", pedidosCocina.size(),
+                        "Pedidos Take Away", pedidosTakeAway.size()), mensaje);
     }
 }

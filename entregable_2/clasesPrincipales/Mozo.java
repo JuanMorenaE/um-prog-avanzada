@@ -19,8 +19,8 @@ public class Mozo implements Runnable {
         this.random = new Random();
     }
 
-    public void agregarTarea(Tarea tarea) {
-        tareas.add(tarea);
+    public static void agregarTarea(Tarea tarea) {
+        Utils.encolar(tareas, tarea, "Tareas de mozos", "Nueva tarea: " + tarea.getTipo());
     }
 
     private void realizarTarea(Tarea tarea) throws InterruptedException {
@@ -70,6 +70,7 @@ public class Mozo implements Runnable {
             throw new IllegalArgumentException("La tarea de entrega debe incluir un pedido");
 
         long time = Utils.RandomBetween(random, Configuracion.TRmin, Configuracion.TRmax);
+        log("Retira y sirve el pedido de la mesa " + pedido.getMesa().numero);
 
         try {
             Thread.sleep(time);
@@ -95,6 +96,7 @@ public class Mozo implements Runnable {
         log("Termina de limpiar la mesa " + mesa.numero + " (tardo " + time + "ms)");
 
         mesa.ocupada = false;
+        Restaurante.estadoDisplay.actualizarMesa(mesa.numero, "Libre", "Mesa limpia y disponible");
         Restaurante.mesasLibres.add(mesa);
     }
 
@@ -115,7 +117,8 @@ public class Mozo implements Runnable {
         while (!Thread.currentThread().isInterrupted()) {
             Tarea tarea = null;
             try {
-                tarea = tareas.take();
+                log("Esperando una tarea");
+                tarea = Utils.retirar(tareas, "Tareas de mozos", "Mozo " + id + " toma una tarea");
                 realizarTarea(tarea);
 
             } catch (InterruptedException e) {

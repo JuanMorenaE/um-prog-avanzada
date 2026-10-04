@@ -2,6 +2,8 @@ package clasesPrincipales;
 
 import clasesAuxiliares.Cocina;
 import clasesAuxiliares.Mesa;
+import display.Display;
+import display.EstadoRestaurante;
 import utilsConfig.Configuracion;
 import utilsConfig.Utils;
 
@@ -17,6 +19,8 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 public class Restaurante implements Runnable {
+    public static final Display display = new Display();
+    public static final EstadoRestaurante estadoDisplay = new EstadoRestaurante(display);
     private final ExecutorService poolTakeAway = Executors.newCachedThreadPool();
     public Random random = new Random();
 
@@ -54,8 +58,12 @@ public class Restaurante implements Runnable {
                     Thread.sleep(time);
 
                     Cliente cliente = new Cliente();
+                    Utils.log(cliente.toString(), "Esperando afuera para formar un grupo");
 
-                    filaClientes.add(cliente);
+                    synchronized (estadoDisplay) {
+                        filaClientes.add(cliente);
+                        estadoDisplay.actualizarCola("Clientes afuera", filaClientes.size(), "Llega " + cliente);
+                    }
                     Utils.log("Restaurante", "Llega el " + cliente + " (en la fila: " + filaClientes.size() + ")");
 
                     semaphore.release();
@@ -78,6 +86,7 @@ public class Restaurante implements Runnable {
 
                     // los clientes para llevar entran sin esperar una mesa ni formar un grupo
                     ClienteTakeAway cliente = new ClienteTakeAway();
+                    Utils.log(cliente.toString(), "Llega para pedir comida para llevar");
                     Utils.log("Restaurante", "Llega el " + cliente + " para llevar");
                     poolTakeAway.execute(cliente);
                 }
@@ -98,8 +107,11 @@ public class Restaurante implements Runnable {
                         break;
 
                     List<Cliente> grupo = new LinkedList<>();
-                    for (int i = 0; i < Configuracion.P; i++)
-                        grupo.add(filaClientes.poll());
+                    synchronized (estadoDisplay) {
+                        for (int i = 0; i < Configuracion.P; i++)
+                            grupo.add(filaClientes.poll());
+                        estadoDisplay.actualizarCola("Clientes afuera", filaClientes.size(), "Se forma un grupo para una mesa");
+                    }
 
                     Utils.log("Restaurante", "Asigna la mesa " + mesa.numero + " a: " + grupo);
 
@@ -125,6 +137,7 @@ public class Restaurante implements Runnable {
 
         Utils.log("Restaurante", "Cierra el restaurante");
         EmpleadoTakeAway.cerrar();
+        estadoDisplay.cambiarApertura(false, "Cierra el restaurante; continua la atencion pendiente");
 
         llegadaClientesThread.interrupt();
         llegadaTakeAwayThread.interrupt();
@@ -133,6 +146,12 @@ public class Restaurante implements Runnable {
         // esperar a los generadores antes de cerrar el pool evita nuevos envios
         if (esperarFin(new Thread[] { llegadaClientesThread, llegadaTakeAwayThread, asignacionDeClietesThread }))
             interrumpido = true;
+
+        Cliente sinMesa;
+        while ((sinMesa = filaClientes.poll()) != null) {
+            Utils.log(sinMesa.toString(), "Se retira sin mesa porque cerro el restaurante");
+        }
+        estadoDisplay.actualizarCola("Clientes afuera", 0, "Se retiran los clientes sin mesa");
 
         poolTakeAway.shutdown();
         boolean poolTerminado = false;

@@ -23,6 +23,7 @@ public class EmpleadoTakeAway implements Runnable {
                 return;
             }
             Restaurante.filaClientesTakeAway.add(cliente);
+            informarColas("Se encola " + cliente);
             monitor.notifyAll();
         }
     }
@@ -31,6 +32,7 @@ public class EmpleadoTakeAway implements Runnable {
         synchronized (monitor) {
             Restaurante.filaClientesTakeAway.remove(cliente);
             cliente.cancelarSinPedido();
+            informarColas("Se retira " + cliente + " de la cola");
         }
     }
 
@@ -43,6 +45,7 @@ public class EmpleadoTakeAway implements Runnable {
             while ((cliente = Restaurante.filaClientesTakeAway.poll()) != null) {
                 cliente.cancelarSinPedido();
             }
+            informarColas("Se cancela la cola Take Away al cerrar");
             monitor.notifyAll();
         }
     }
@@ -54,6 +57,7 @@ public class EmpleadoTakeAway implements Runnable {
         }
         synchronized (monitor) {
             pedidosListos.add(pedido);
+            informarColas("Nuevo pedido Take Away listo para entregar");
             monitor.notifyAll();
         }
     }
@@ -70,6 +74,7 @@ public class EmpleadoTakeAway implements Runnable {
                             log("Finaliza: todos los pedidos aceptados fueron entregados");
                             return;
                         }
+                        log("Esperando clientes o pedidos listos");
                         monitor.wait();
                     }
                     //la entrega tiene prioridad al seleccionar el siguiente trabajo
@@ -83,6 +88,7 @@ public class EmpleadoTakeAway implements Runnable {
                             cliente = null;
                         }
                     }
+                    informarColas("El empleado selecciona su siguiente tarea");
                 }
                 
                 if (listo != null) {
@@ -112,11 +118,19 @@ public class EmpleadoTakeAway implements Runnable {
         pedido.getClienteTakeAway().recibirPedido();
         synchronized (monitor) {
             pedidosPendientes--;
+            informarColas("Se completo una entrega Take Away");
             monitor.notifyAll();
         }
     }
 
     private void log(String mensaje) {
         Utils.log("Empleado Take Away", mensaje);
+    }
+
+    // Se invoca bajo el monitor del empleado.
+    private static void informarColas(String mensaje) {
+        Restaurante.estadoDisplay.registrarCambio("Servicio Take Away", "Pendientes: " + pedidosPendientes,
+                java.util.Map.of(), java.util.Map.of("Atencion Take Away", Restaurante.filaClientesTakeAway.size(),
+                        "Entregas Take Away", pedidosListos.size()), mensaje);
     }
 }

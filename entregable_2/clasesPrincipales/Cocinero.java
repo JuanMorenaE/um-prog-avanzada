@@ -21,12 +21,13 @@ public class Cocinero implements Runnable {
     public void run() {
         while (true) {
             try {
+                log("Esperando", "Espera un plato para cocinar");
                 TrabajoCocina trabajo = Restaurante.cocina.tomarTrabajo();
                 Pedido pedido = trabajo.getPedido();
                 String destino = pedido.getTipo() == Pedido.Tipo.MESA
                         ? "la mesa " + pedido.getMesa().numero
                         : pedido.getClienteTakeAway().toString();
-                log("Toma '" + trabajo.getMenu().getNombre() + "' del pedido de " + destino
+                log("Esperando sartenes", "Toma '" + trabajo.getMenu().getNombre() + "' del pedido de " + destino
                         + ", espera 2 sartenes");
 
                 Restaurante.cocina.adquirirSartenes();
@@ -35,18 +36,18 @@ public class Cocinero implements Runnable {
                 } finally {
                     Restaurante.cocina.liberarSartenes();
                 }
-                log("Termina '" + trabajo.getMenu().getNombre() + "' de " + destino + " y libera las sartenes");
+                log("Plato terminado", "Termina '" + trabajo.getMenu().getNombre() + "' de " + destino + " y libera las sartenes");
 
                 if (trabajo.getPedido().marcarPlatoTerminado()) {
-                    log("El pedido de " + destino + " esta completo, queda listo para entregar");
+                    log("Pedido completo", "El pedido de " + destino + " esta completo, queda listo para entregar");
                     if (pedido.getTipo() == Pedido.Tipo.TAKE_AWAY) {
                         EmpleadoTakeAway.agregarPedidoListo(pedido);
                     } else {
-                        Mozo.tareas.add(new Tarea(Tarea.TipoTarea.ENTREGAR_COMIDA, null, pedido));
+                        Mozo.agregarTarea(new Tarea(Tarea.TipoTarea.ENTREGAR_COMIDA, null, pedido));
                     }
                 }
             } catch (InterruptedException e) {
-                log("Termina su turno");
+                log("Terminado", "Termina su turno");
                 Thread.currentThread().interrupt();
                 return;
             }
@@ -57,11 +58,11 @@ public class Cocinero implements Runnable {
     // paralelo.
     public void cocinarMenu(Menu menu) throws InterruptedException {
         long time = Utils.RandomBetween(random, menu.getTCmin(), menu.getTCmax());
-        log("Consigue las sartenes y cocina '" + menu.getNombre() + "' (" + time + "ms)");
+        log("Cocinando " + menu.getNombre(), "Consigue las sartenes y cocina '" + menu.getNombre() + "' (" + time + "ms)");
         Thread.sleep(time);
     }
 
-    private void log(String mensaje) {
-        Utils.log("Cocinero " + id, mensaje);
+    private void log(String estado, String mensaje) {
+        Restaurante.estadoDisplay.actualizarActor("Cocinero " + id, estado, mensaje);
     }
 }
