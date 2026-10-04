@@ -38,13 +38,5 @@ public class Main {
 
         Thread mainThread = new Thread(restaurante);
         mainThread.start();
-
-        try {
-            Thread.sleep(Configuracion.T);
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
-
-        mainThread.interrupt();
     }
 }

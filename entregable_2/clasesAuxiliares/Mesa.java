@@ -2,6 +2,7 @@ package clasesAuxiliares;
 
 import clasesPrincipales.Cliente;
 import clasesPrincipales.Mozo;
+import clasesPrincipales.Restaurante;
 import utilsConfig.Configuracion;
 import utilsConfig.Utils;
 
@@ -73,6 +74,11 @@ public class Mesa {
             @Override
             protected boolean onAdvance(int phase, int registeredParties) {
                 if (phase == 0) {
+                    if (!Restaurante.abierto) {
+                        mesa.log("El restaurante cerro antes de pedir, los clientes se van");
+                        return true;
+                    }
+
                     mesa.log("Todos eligieron, se pide un mozo para tomar el pedido");
                     Mozo.tareas.add(new Tarea(Tarea.TipoTarea.TOMAR_PEDIDO, mesa, null));
                 } else if (phase == 1) {

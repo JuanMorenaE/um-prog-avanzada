@@ -94,12 +94,21 @@ public class Cliente implements Runnable {
         log("Espera a que el resto de la mesa elija");
         try {
             mesa.phaser.arriveAndAwaitAdvance();
-        } catch (Exception ex) {
+
+            if (mesa.phaser.isTerminated()) {
+                log("Se va sin pedir porque cerro el restaurante");
+                mesa.levantarse(this);
+                return;
+            }
+        } catch (
+
+        Exception ex) {
 
         }
 
         // 3. Espera la comida
         this.esperando = false;
+
         log("Espera la comida");
         mesa.esperarComida();
         log("Recibe la comida");

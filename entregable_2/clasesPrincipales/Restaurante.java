@@ -26,6 +26,8 @@ public class Restaurante implements Runnable {
     public static ArrayBlockingQueue<Mesa> mesasLibres = new ArrayBlockingQueue<>(Configuracion.M);
     public static LinkedBlockingQueue<Mesa> mesasPorAtender = new LinkedBlockingQueue<>(Configuracion.M);
 
+    public static volatile boolean abierto = true;
+
     public Semaphore semaphore = new Semaphore(0);
 
     public Restaurante() {
@@ -35,27 +37,27 @@ public class Restaurante implements Runnable {
     @Override
     public void run() {
         Thread llegadaClientesThread = new Thread(() -> {
-            while (true) {
-                long time = Utils.RandomBetween(random, Configuracion.TPmin, Configuracion.TPmax);
-
-                try {
+            try {
+                while (true) {
+                    long time = Utils.RandomBetween(random, Configuracion.TPmin, Configuracion.TPmax);
                     Thread.sleep(time);
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
+
+                    Cliente cliente = new Cliente();
+
+                    filaClientes.add(cliente);
+                    Utils.log("Restaurante", "Llega el " + cliente + " (en la fila: " + filaClientes.size() + ")");
+
+                    semaphore.release();
                 }
-
-                Cliente cliente = new Cliente();
-
-                filaClientes.add(cliente);
-                Utils.log("Restaurante", "Llega el " + cliente + " (en la fila: " + filaClientes.size() + ")");
-
-                semaphore.release();
+            } catch (InterruptedException ex) {
+                return;
             }
+
         });
 
         Thread asignacionDeClietesThread = new Thread(() -> {
-            while (true) {
-                try {
+            try {
+                while (true) {
                     semaphore.acquire(Configuracion.P);
                     Utils.log("Restaurante", "Hay un grupo de " + Configuracion.P + " clientes, busca una mesa libre");
 
@@ -72,15 +74,34 @@ public class Restaurante implements Runnable {
 
                     for (Cliente cliente : grupo)
                         mesa.sentarse(cliente);
-
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
                 }
+            } catch (InterruptedException ex) {
+                return;
             }
+
         });
 
         llegadaClientesThread.start();
         asignacionDeClietesThread.start();
+
+        try {
+            Thread.sleep(Configuracion.T);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+
+        Utils.log("Restaurante", "Cierra el restaurante");
+        abierto = false;
+
+        llegadaClientesThread.interrupt();
+        asignacionDeClietesThread.interrupt();
+
+        try {
+            llegadaClientesThread.join();
+            asignacionDeClietesThread.join();
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     private synchronized Mesa esperarMesaLibre() {
