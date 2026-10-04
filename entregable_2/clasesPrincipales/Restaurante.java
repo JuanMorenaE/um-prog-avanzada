@@ -10,10 +10,14 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 public class Restaurante implements Runnable {
+    private final ExecutorService poolTakeAway = Executors.newCachedThreadPool();
     public Random random = new Random();
 
     public static Cocina cocina = new Cocina();
@@ -69,7 +73,7 @@ public class Restaurante implements Runnable {
                     // los clientes para llevar entran sin esperar una mesa ni formar un grupo
                     ClienteTakeAway cliente = new ClienteTakeAway();
                     Utils.log("Restaurante", "Llega el " + cliente + " para llevar");
-                    new Thread(cliente, "ClienteTakeAway-" + cliente.id).start();
+                    poolTakeAway.execute(cliente);
                 }
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
@@ -106,10 +110,11 @@ public class Restaurante implements Runnable {
         llegadaTakeAwayThread.start();
         asignacionDeClietesThread.start();
 
+        boolean interrumpido = false;
         try {
             Thread.sleep(Configuracion.T);
         } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
+            interrumpido = true;
         }
 
         Utils.log("Restaurante", "Cierra el restaurante");
@@ -119,11 +124,31 @@ public class Restaurante implements Runnable {
         llegadaTakeAwayThread.interrupt();
         asignacionDeClietesThread.interrupt();
 
-        try {
-            llegadaClientesThread.join();
-            llegadaTakeAwayThread.join();
-            asignacionDeClietesThread.join();
-        } catch (InterruptedException ex) {
+        // esperar a los generadores antes de cerrar el pool evita nuevos envios
+        for (Thread hilo : new Thread[] { llegadaClientesThread, llegadaTakeAwayThread, asignacionDeClietesThread }) {
+            boolean terminado = false;
+            while (!terminado) {
+                try {
+                    hilo.join();
+                    terminado = true;
+                } catch (InterruptedException ex) {
+                    interrumpido = true;
+                }
+            }
+        }
+
+        poolTakeAway.shutdown();
+        boolean poolTerminado = false;
+        while (!poolTerminado) {
+            try {
+                poolTerminado = poolTakeAway.awaitTermination(1, TimeUnit.SECONDS);
+            } catch (InterruptedException ex) {
+                // mantener el cierre ordenado para terminar los pedidos aceptados
+                interrumpido = true;
+            }
+        }
+        Utils.log("Restaurante", "Finalizaron todos los clientes Take Away del pool");
+        if (interrumpido) {
             Thread.currentThread().interrupt();
         }
     }
