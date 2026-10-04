@@ -22,8 +22,11 @@ public class Restaurante implements Runnable {
 
     public static Cocina cocina = new Cocina();
     public Cocinero[] cocineros = new Cocinero[Configuracion.C];
+    public Thread[] hilosCocineros = new Thread[Configuracion.C];
     public Mozo[] mozos = new Mozo[Configuracion.Z];
+    public Thread[] hilosMozos = new Thread[Configuracion.Z];
     public Cajero[] cajeros = new Cajero[Configuracion.Y];
+    public Thread[] hilosCajeros = new Thread[Configuracion.Y];
 
     public ConcurrentLinkedQueue<Cliente> filaClientes = new ConcurrentLinkedQueue<>();
     public static final LinkedBlockingQueue<Cliente> filaClientesPagar = new LinkedBlockingQueue<>();
@@ -32,6 +35,9 @@ public class Restaurante implements Runnable {
     public static LinkedBlockingQueue<Mesa> mesasPorAtender = new LinkedBlockingQueue<>(Configuracion.M);
 
     public static volatile boolean abierto = true;
+
+    private static final Object monitorComida = new Object();
+    private static int clientesEsperandoComida = 0;
 
     public Semaphore semaphore = new Semaphore(0);
 
@@ -125,17 +131,8 @@ public class Restaurante implements Runnable {
         asignacionDeClietesThread.interrupt();
 
         // esperar a los generadores antes de cerrar el pool evita nuevos envios
-        for (Thread hilo : new Thread[] { llegadaClientesThread, llegadaTakeAwayThread, asignacionDeClietesThread }) {
-            boolean terminado = false;
-            while (!terminado) {
-                try {
-                    hilo.join();
-                    terminado = true;
-                } catch (InterruptedException ex) {
-                    interrumpido = true;
-                }
-            }
-        }
+        if (esperarFin(new Thread[] { llegadaClientesThread, llegadaTakeAwayThread, asignacionDeClietesThread }))
+            interrumpido = true;
 
         poolTakeAway.shutdown();
         boolean poolTerminado = false;
@@ -148,9 +145,79 @@ public class Restaurante implements Runnable {
             }
         }
         Utils.log("Restaurante", "Finalizaron todos los clientes Take Away del pool");
+
+        Utils.log("Restaurante", "Espera a que todas las mesas reciban su comida");
+        synchronized (monitorComida) {
+            while (clientesEsperandoComida > 0) {
+                try {
+                    monitorComida.wait();
+                } catch (InterruptedException ex) {
+                    interrumpido = true;
+                }
+            }
+        }
+
+        Utils.log("Restaurante", "No quedan pedidos por cocinar, los cocineros terminan su turno");
+        for (Thread hilo : hilosCocineros)
+            hilo.interrupt();
+        if (esperarFin(hilosCocineros))
+            interrumpido = true;
+
+        Utils.log("Restaurante", "Espera a que se desocupen y limpien todas las mesas");
+        int mesasDevueltas = 0;
+        while (mesasDevueltas < Configuracion.M) {
+            try {
+                mesasLibres.take();
+                mesasDevueltas++;
+            } catch (InterruptedException ex) {
+                interrumpido = true;
+            }
+        }
+
+        Utils.log("Restaurante", "Todas las mesas estan libres, los mozos y cajeros terminan su turno");
+        for (Thread hilo : hilosMozos)
+            hilo.interrupt();
+        for (Thread hilo : hilosCajeros)
+            hilo.interrupt();
+        if (esperarFin(hilosMozos))
+            interrumpido = true;
+        if (esperarFin(hilosCajeros))
+            interrumpido = true;
+
+        Utils.log("Restaurante", "Fin de la jornada, todo el personal termino su turno");
+
         if (interrumpido) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    public static void clienteEsperaComida() {
+        synchronized (monitorComida) {
+            clientesEsperandoComida++;
+        }
+    }
+
+    public static void clienteDejaDeEsperarComida() {
+        synchronized (monitorComida) {
+            clientesEsperandoComida--;
+            monitorComida.notifyAll();
+        }
+    }
+
+    private boolean esperarFin(Thread[] hilos) {
+        boolean interrumpido = false;
+        for (Thread hilo : hilos) {
+            boolean terminado = false;
+            while (!terminado) {
+                try {
+                    hilo.join();
+                    terminado = true;
+                } catch (InterruptedException ex) {
+                    interrumpido = true;
+                }
+            }
+        }
+        return interrumpido;
     }
 
     private synchronized Mesa esperarMesaLibre() {

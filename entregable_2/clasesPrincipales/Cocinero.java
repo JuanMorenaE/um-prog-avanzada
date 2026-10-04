@@ -46,6 +46,7 @@ public class Cocinero implements Runnable {
                     }
                 }
             } catch (InterruptedException e) {
+                log("Termina su turno");
                 Thread.currentThread().interrupt();
                 return;
             }

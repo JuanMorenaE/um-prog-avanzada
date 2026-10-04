@@ -20,19 +20,22 @@ public class Main {
         // Cargamos Mozos
         for (int i = 0; i < Configuracion.Z; i++) {
             restaurante.mozos[i] = new Mozo(i + 1);
-            new Thread(restaurante.mozos[i]).start();
+            restaurante.hilosMozos[i] = new Thread(restaurante.mozos[i], "Mozo " + (i + 1));
+            restaurante.hilosMozos[i].start();
         }
 
         // Cargamos Cocineros
         for (int i = 0; i < Configuracion.C; i++) {
             restaurante.cocineros[i] = new Cocinero(i + 1);
-            new Thread(restaurante.cocineros[i]).start();
+            restaurante.hilosCocineros[i] = new Thread(restaurante.cocineros[i], "Cocinero " + (i + 1));
+            restaurante.hilosCocineros[i].start();
         }
 
         // Cargamos Cajeros
         for (int i = 0; i < Configuracion.Y; i++) {
             restaurante.cajeros[i] = new Cajero(i + 1);
-            new Thread(restaurante.cajeros[i]).start();
+            restaurante.hilosCajeros[i] = new Thread(restaurante.cajeros[i], "Cajero " + (i + 1));
+            restaurante.hilosCajeros[i].start();
         }
 
         // Cargamos el empleado dedicado a Take Away

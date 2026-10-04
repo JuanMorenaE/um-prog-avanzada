@@ -122,6 +122,7 @@ public class Mozo implements Runnable {
                 if (tarea != null) {
                     agregarTarea(tarea);
                 }
+                log("Termina su turno");
                 Thread.currentThread().interrupt();
                 return;
             }
