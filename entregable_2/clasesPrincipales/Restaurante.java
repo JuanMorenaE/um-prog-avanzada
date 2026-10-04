@@ -23,6 +23,7 @@ public class Restaurante implements Runnable {
 
     public ConcurrentLinkedQueue<Cliente> filaClientes = new ConcurrentLinkedQueue<>();
     public static final LinkedBlockingQueue<Cliente> filaClientesPagar = new LinkedBlockingQueue<>();
+    public static final LinkedBlockingQueue<ClienteTakeAway> filaClientesTakeAway = new LinkedBlockingQueue<>();
     public static ArrayBlockingQueue<Mesa> mesasLibres = new ArrayBlockingQueue<>(Configuracion.M);
     public static LinkedBlockingQueue<Mesa> mesasPorAtender = new LinkedBlockingQueue<>(Configuracion.M);
 
@@ -55,6 +56,26 @@ public class Restaurante implements Runnable {
 
         });
 
+        Thread llegadaTakeAwayThread = new Thread(() -> {
+            Random randomTakeAway = new Random();
+            try {
+                while (abierto) {
+                    long tiempo = Utils.RandomBetween(randomTakeAway, Configuracion.TWmin, Configuracion.TWmax);
+                    Thread.sleep(tiempo);
+                    if (!abierto) {
+                        return;
+                    }
+
+                    // los clientes para llevar entran sin esperar una mesa ni formar un grupo
+                    ClienteTakeAway cliente = new ClienteTakeAway();
+                    Utils.log("Restaurante", "Llega el " + cliente + " para llevar");
+                    new Thread(cliente, "ClienteTakeAway-" + cliente.id).start();
+                }
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+        }, "LlegadaTakeAway");
+
         Thread asignacionDeClietesThread = new Thread(() -> {
             try {
                 while (true) {
@@ -82,6 +103,7 @@ public class Restaurante implements Runnable {
         });
 
         llegadaClientesThread.start();
+        llegadaTakeAwayThread.start();
         asignacionDeClietesThread.start();
 
         try {
@@ -91,13 +113,15 @@ public class Restaurante implements Runnable {
         }
 
         Utils.log("Restaurante", "Cierra el restaurante");
-        abierto = false;
+        EmpleadoTakeAway.cerrar();
 
         llegadaClientesThread.interrupt();
+        llegadaTakeAwayThread.interrupt();
         asignacionDeClietesThread.interrupt();
 
         try {
             llegadaClientesThread.join();
+            llegadaTakeAwayThread.join();
             asignacionDeClietesThread.join();
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();

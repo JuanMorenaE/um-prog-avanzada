@@ -1,6 +1,7 @@
 import clasesAuxiliares.Mesa;
 import clasesPrincipales.Cocinero;
 import clasesPrincipales.Cajero;
+import clasesPrincipales.EmpleadoTakeAway;
 import clasesPrincipales.Mozo;
 import clasesPrincipales.Restaurante;
 import utilsConfig.Configuracion;
@@ -33,6 +34,11 @@ public class Main {
             restaurante.cajeros[i] = new Cajero(i + 1);
             new Thread(restaurante.cajeros[i]).start();
         }
+
+        // Cargamos el empleado dedicado a Take Away
+        EmpleadoTakeAway empleadoTakeAway = new EmpleadoTakeAway();
+        Thread empleadoTakeAwayThread = new Thread(empleadoTakeAway, "EmpleadoTakeAway");
+        empleadoTakeAwayThread.start();
 
         // ============================
 
