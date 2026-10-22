@@ -4,3 +4,6 @@ class Producto:
         self.nombre = None
         self.categoria = None
         self.precio = None
+
+    def __str__(self):
+        return f"{self.nombre} ${self.precio} - Categoria: {self.categoria}"

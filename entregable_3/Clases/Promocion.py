@@ -3,7 +3,15 @@ class Promocion:
         self.codigo = codigo
         self.nombre = None
         self.descuento = None
-        self.condiciones = []
+        self.condiciones = {}
 
-    def cuando_producto(self, producto):
-        return self
+    def __str__(self):
+        text = f"{self.codigo} - {self.nombre} ({self.descuento}% OFF):"
+
+        for codigo in self.condiciones:
+            if (self.condiciones[codigo]["operator"] == "equal"):
+                text += f"\n\tProducto {codigo}. Cantidad = {self.condiciones[codigo]["quantity"]}"
+            else:
+                text += f"\n\tProducto {codigo}. Cantidad > {self.condiciones[codigo]["quantity"]}"
+
+        return text 
