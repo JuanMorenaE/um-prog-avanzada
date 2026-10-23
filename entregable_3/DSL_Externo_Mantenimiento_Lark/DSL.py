@@ -1,28 +1,28 @@
 data = """
 AGREGAR PRODUCTO 5
-    NOMBRE “Azúcar”
+    NOMBRE "Azúcar"
     PRECIO 60
-    CATEGORIA “Comestible”
+    CATEGORIA "Comestible"
 FIN
 AGREGAR PRODUCTO 6
     PRECIO 45
-    NOMBRE “Leche”
+    NOMBRE "Leche"
 FIN
 ACTUALIZAR PRODUCTO 3
-    NOMBRE “Coca Cola”
+    NOMBRE "Coca Cola"
 FIN
 ACTUALIZAR PRODUCTO 2
-    CATEGORIA “Comestible”
+    CATEGORIA "Comestible"
     PRECIO 35.5
 FIN
 ACTUALIZAR PROMOCION 1
     CUANDO
         PRODUCTO 2 CANTIDAD >= 3
-    NOMBRE “Harina x3”
+    NOMBRE "Harina x3"
 FIN
 AGREGAR PROMOCION 3
     DESCUENTO 30.5
-    NOMBRE “Leche + Azúcar”
+    NOMBRE "Leche + Azúcar"
     CUANDO
         PRODUCTO 6
         PRODUCTO 5 CANTIDAD = 1
