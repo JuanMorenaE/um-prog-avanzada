@@ -1,14 +1,19 @@
 from lark import Lark, Transformer, v_args
 from DSL import data
 
+
+# ============================================================
+# GRAMÁTICA
+# ============================================================
+
 grammar = r"""
-start: add* update* delete*
+start: (add | update | delete)+
 
-add: "AGREGAR" add_type_commands "FIN"
-add_type_commands: add_product_commands | add_offer_commands
+?add: "AGREGAR" add_type_commands "FIN"
+?add_type_commands: add_product_commands | add_offer_commands
 
 
-add_product_commands: "PRODUCTO" code add_product_command_list "FIN"
+add_product_commands: "PRODUCTO" int add_product_command_list
 add_product_command_list: name price category?
                         | price name category?
                         | name category price
@@ -17,34 +22,74 @@ add_product_command_list: name price category?
                         | category price name
 
                         
-add_offer_commands: "PROMOCION" code add_offer_command_list "FIN"
-add_offer_command_list: name price disscount
-                        | price name disscount
-                        | name disscount price
-                        | price disscount name
-                        | disscount price name
-                        | disccount name price
+add_offer_commands: "PROMOCION" int add_offer_command_list
+add_offer_command_list: name discount conditions
+                        | discount name conditions
+                        | name conditions discount
+                        | discount conditions name
+                        | conditions name discount
+                        | conditions discount name
 
 
-update: "ACTUALIZAR" type update_command_list "FIN"
-delete: "ELIMINAR" type number
+?update: "ACTUALIZAR" update_type_commands "FIN"
+?update_type_commands: update_product_commands | update_offer_commands
 
+
+update_product_commands: "PRODUCTO" int update_product_command_list
+update_product_command_list: name price? category?
+                            | name category? price?
+                            | price name? category?
+                            | price category? name?
+                            | category name? price?
+                            | category price? name?
+
+                            
+update_offer_commands: "PROMOCION" int update_offer_command_list
+update_offer_command_list: name discount? conditions?
+                        | name conditions? discount?
+                        | discount name? conditions?
+                        | discount conditions? name?
+                        | conditions name? discount?
+                        | conditions discount? name?
+
+                        
+?delete: "ELIMINAR PRODUCTO" int -> delete_product
+        | "ELIMINAR PROMOCION" int -> delete_offer
+
+conditions: "CUANDO" product_discount_list
+product_discount_list: ("PRODUCTO" int quantity?)+
+quantity: "CANTIDAD" operator int
 
 name: "NOMBRE" text
-price: "PRECIO" number
+price: "PRECIO" decimal
 category: "CATEGORIA" text
-disscount: "DESCUENTO" number
-condition: "CUANDO" product_condition_list
+discount: "DESCUENTO" decimal
 
-product_condition_list: "PRODUCTO" number condition? product_condition_list*
-condition: "CANTIDAD" operator number
+decimal: /[0-9]+(\.[0-9]{1,2})?/
+int: /[0-9]+/
+text: /"[^"\s]([^"\n]*[^"\s])?"/
+operator: "=" -> eq
+        | ">=" -> ge
 
-number: /[1-9]([0-9]+)?(.[0-9]{1,2})/
-code: /[0-9]+/
-text: /\"[A-Za-z_][A-Za-z0-9_\s]*\"/
-operator: "=" | ">="
-type: "PRODUCTO" | "PROMOCION"
+%import common.WS
+%ignore WS
 """
 
-parser = Lark(grammar, parser="lalr", transformer=SecurityTransformer())
-result = parser.parse(data)
+
+# ============================================================
+# PARSEA EL DSL
+# ============================================================
+
+@v_args(inline=True)
+class MantenimientoTransformer(Transformer):
+    def int(self, token):
+        return int(token)
+
+    def decimal(self, token):
+            return float(token)
+
+parser = Lark(grammar, start="start", parser="lalr", transformer=MantenimientoTransformer())
+tree = parser.parse(data)
+
+from pprint import pprint
+print(tree.pretty())
