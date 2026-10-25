@@ -38,25 +38,25 @@ class Promocion:
 
 
 
-Tree(
-    Token('RULE', 'start'), [
-        Tree(
-            Token('RULE', 'add'), [
-                Tree(
-                    Token('RULE', 'add_type_commands'), [
-                        Tree(
-                            Token('RULE', 'add_product_commands'),[
-                                5, 
-                                Tree(
-                                    Token('RULE', 'add_product_command_list'), [
-                                        Tree(
-                                            Token('RULE', 'name'), [
-                                                Tree(
-                                                    Token('RULE', 'text'), [
-                                                        Token('__ANON_4', '"Azúcar"')
-                                                    ]
-                                                )
-                                            ]
-                                        ), 
-                                        Tree(
-                                            Token('RULE', 'price'), [Tree(Token('RULE', 'decimal'), [Token('__ANON_2', '60')])]), Tree(Token('RULE', 'category'), [Tree(Token('RULE', 'text'), [Token('__ANON_4', '"Comestible"')])])])])])]), Tree(Token('RULE', 'add'), [Tree(Token('RULE', 'add_type_commands'), [Tree(Token('RULE', 'add_product_commands'), [6, Tree(Token('RULE', 'add_product_command_list'), [Tree(Token('RULE', 'price'), [Tree(Token('RULE', 'decimal'), [Token('__ANON_2', '45')])]), Tree(Token('RULE', 'name'), [Tree(Token('RULE', 'text'), [Token('__ANON_4', '"Leche"')])])])])])]), Tree(Token('RULE', 'update'), [Tree(Token('RULE', 'update_type_commands'), [Tree(Token('RULE', 'update_product_commands'), [3, Tree(Token('RULE', 'update_product_command_list'), [Tree(Token('RULE', 'name'), [Tree(Token('RULE', 'text'), [Token('__ANON_4', '"Coca Cola"')])])])])])]), Tree(Token('RULE', 'update'), [Tree(Token('RULE', 'update_type_commands'), [Tree(Token('RULE', 'update_product_commands'), [2, Tree(Token('RULE', 'update_product_command_list'), [Tree(Token('RULE', 'category'), [Tree(Token('RULE', 'text'), [Token('__ANON_4', '"Comestible"')])]), Tree(Token('RULE', 'price'),[Tree(Token('RULE', 'decimal'), [Token('__ANON_2', '35.5')])])])])])]), Tree(Token('RULE', 'update'), [Tree(Token('RULE', 'update_type_commands'), [Tree(Token('RULE', 'update_offer_commands'), [1, Tree(Token('RULE', 'update_offer_command_list'), [Tree(Token('RULE', 'conditions'), [Tree(Token('RULE', 'product_discount_list'), [2, Tree(Token('RULE', 'quantity'), [Tree('ge', []), 3])])]), Tree(Token('RULE', 'name'), [Tree(Token('RULE', 'text'), [Token('__ANON_4', '"Harina x3"')])])])])])]), Tree(Token('RULE', 'add'), [Tree(Token('RULE', 'add_type_commands'), [Tree(Token('RULE', 'add_offer_commands'), [3, Tree(Token('RULE', 'add_offer_command_list'), [Tree(Token('RULE', 'discount'), [Tree(Token('RULE', 'decimal'),[Token('__ANON_2', '30.5')])]), Tree(Token('RULE', 'name'), [Tree(Token('RULE', 'text'), [Token('__ANON_4', '"Leche + Azúcar"')])]), Tree(Token('RULE', 'conditions'), [Tree(Token('RULE', 'product_discount_list'), [6, 5, Tree(Token('RULE', 'quantity'), [Tree('eq', []), 1])])])])])])]), Tree('delete_product', [1]), Tree('delete_offer', [2])])
+    """Tree(
+        Token('RULE', 'start'), [
+            Tree(
+                Token('RULE', 'add'), [
+                    Tree(
+                        Token('RULE', 'add_type_commands'), [
+                            Tree(
+                                Token('RULE', 'add_product_commands'),[
+                                    5, 
+                                    Tree(
+                                        Token('RULE', 'add_product_command_list'), [
+                                            Tree(
+                                                Token('RULE', 'name'), [
+                                                    Tree(
+                                                        Token('RULE', 'text'), [
+                                                            Token('__ANON_4', '"Azúcar"')
+                                                        ]
+                                                    )
+                                                ]
+                                            ), 
+                                            Tree(
+                                                Token('RULE', 'price'), [Tree(Token('RULE', 'decimal'), [Token('__ANON_2', '60')])]), Tree(Token('RULE', 'category'), [Tree(Token('RULE', 'text'), [Token('__ANON_4', '"Comestible"')])])])])])]), Tree(Token('RULE', 'add'), [Tree(Token('RULE', 'add_type_commands'), [Tree(Token('RULE', 'add_product_commands'), [6, Tree(Token('RULE', 'add_product_command_list'), [Tree(Token('RULE', 'price'), [Tree(Token('RULE', 'decimal'), [Token('__ANON_2', '45')])]), Tree(Token('RULE', 'name'), [Tree(Token('RULE', 'text'), [Token('__ANON_4', '"Leche"')])])])])])]), Tree(Token('RULE', 'update'), [Tree(Token('RULE', 'update_type_commands'), [Tree(Token('RULE', 'update_product_commands'), [3, Tree(Token('RULE', 'update_product_command_list'), [Tree(Token('RULE', 'name'), [Tree(Token('RULE', 'text'), [Token('__ANON_4', '"Coca Cola"')])])])])])]), Tree(Token('RULE', 'update'), [Tree(Token('RULE', 'update_type_commands'), [Tree(Token('RULE', 'update_product_commands'), [2, Tree(Token('RULE', 'update_product_command_list'), [Tree(Token('RULE', 'category'), [Tree(Token('RULE', 'text'), [Token('__ANON_4', '"Comestible"')])]), Tree(Token('RULE', 'price'),[Tree(Token('RULE', 'decimal'), [Token('__ANON_2', '35.5')])])])])])]), Tree(Token('RULE', 'update'), [Tree(Token('RULE', 'update_type_commands'), [Tree(Token('RULE', 'update_offer_commands'), [1, Tree(Token('RULE', 'update_offer_command_list'), [Tree(Token('RULE', 'conditions'), [Tree(Token('RULE', 'product_discount_list'), [2, Tree(Token('RULE', 'quantity'), [Tree('ge', []), 3])])]), Tree(Token('RULE', 'name'), [Tree(Token('RULE', 'text'), [Token('__ANON_4', '"Harina x3"')])])])])])]), Tree(Token('RULE', 'add'), [Tree(Token('RULE', 'add_type_commands'), [Tree(Token('RULE', 'add_offer_commands'), [3, Tree(Token('RULE', 'add_offer_command_list'), [Tree(Token('RULE', 'discount'), [Tree(Token('RULE', 'decimal'),[Token('__ANON_2', '30.5')])]), Tree(Token('RULE', 'name'), [Tree(Token('RULE', 'text'), [Token('__ANON_4', '"Leche + Azúcar"')])]), Tree(Token('RULE', 'conditions'), [Tree(Token('RULE', 'product_discount_list'), [6, 5, Tree(Token('RULE', 'quantity'), [Tree('eq', []), 1])])])])])])]), Tree('delete_product', [1]), Tree('delete_offer', [2])])"""

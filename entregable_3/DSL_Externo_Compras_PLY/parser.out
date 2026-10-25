@@ -1,0 +1,150 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> compras
+Rule 1     compras -> compras compra
+Rule 2     compras -> compra
+Rule 3     compra -> COMPRA productos FIN
+Rule 4     productos -> productos producto
+Rule 5     productos -> producto
+Rule 6     producto -> PRODUCTO ENTERO CANTIDAD ENTERO
+Rule 7     producto -> PRODUCTO ENTERO
+
+Terminals, with rules where they appear
+
+CANTIDAD             : 6
+COMPRA               : 3
+ENTERO               : 6 6 7
+FIN                  : 3
+PRODUCTO             : 6 7
+error                : 
+
+Nonterminals, with rules where they appear
+
+compra               : 1 2
+compras              : 1 0
+producto             : 4 5
+productos            : 3 4
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . compras
+    (1) compras -> . compras compra
+    (2) compras -> . compra
+    (3) compra -> . COMPRA productos FIN
+
+    COMPRA          shift and go to state 3
+
+    compras                        shift and go to state 1
+    compra                         shift and go to state 2
+
+state 1
+
+    (0) S' -> compras .
+    (1) compras -> compras . compra
+    (3) compra -> . COMPRA productos FIN
+
+    COMPRA          shift and go to state 3
+
+    compra                         shift and go to state 4
+
+state 2
+
+    (2) compras -> compra .
+
+    COMPRA          reduce using rule 2 (compras -> compra .)
+    $end            reduce using rule 2 (compras -> compra .)
+
+
+state 3
+
+    (3) compra -> COMPRA . productos FIN
+    (4) productos -> . productos producto
+    (5) productos -> . producto
+    (6) producto -> . PRODUCTO ENTERO CANTIDAD ENTERO
+    (7) producto -> . PRODUCTO ENTERO
+
+    PRODUCTO        shift and go to state 7
+
+    productos                      shift and go to state 5
+    producto                       shift and go to state 6
+
+state 4
+
+    (1) compras -> compras compra .
+
+    COMPRA          reduce using rule 1 (compras -> compras compra .)
+    $end            reduce using rule 1 (compras -> compras compra .)
+
+
+state 5
+
+    (3) compra -> COMPRA productos . FIN
+    (4) productos -> productos . producto
+    (6) producto -> . PRODUCTO ENTERO CANTIDAD ENTERO
+    (7) producto -> . PRODUCTO ENTERO
+
+    FIN             shift and go to state 8
+    PRODUCTO        shift and go to state 7
+
+    producto                       shift and go to state 9
+
+state 6
+
+    (5) productos -> producto .
+
+    FIN             reduce using rule 5 (productos -> producto .)
+    PRODUCTO        reduce using rule 5 (productos -> producto .)
+
+
+state 7
+
+    (6) producto -> PRODUCTO . ENTERO CANTIDAD ENTERO
+    (7) producto -> PRODUCTO . ENTERO
+
+    ENTERO          shift and go to state 10
+
+
+state 8
+
+    (3) compra -> COMPRA productos FIN .
+
+    COMPRA          reduce using rule 3 (compra -> COMPRA productos FIN .)
+    $end            reduce using rule 3 (compra -> COMPRA productos FIN .)
+
+
+state 9
+
+    (4) productos -> productos producto .
+
+    FIN             reduce using rule 4 (productos -> productos producto .)
+    PRODUCTO        reduce using rule 4 (productos -> productos producto .)
+
+
+state 10
+
+    (6) producto -> PRODUCTO ENTERO . CANTIDAD ENTERO
+    (7) producto -> PRODUCTO ENTERO .
+
+    CANTIDAD        shift and go to state 11
+    FIN             reduce using rule 7 (producto -> PRODUCTO ENTERO .)
+    PRODUCTO        reduce using rule 7 (producto -> PRODUCTO ENTERO .)
+
+
+state 11
+
+    (6) producto -> PRODUCTO ENTERO CANTIDAD . ENTERO
+
+    ENTERO          shift and go to state 12
+
+
+state 12
+
+    (6) producto -> PRODUCTO ENTERO CANTIDAD ENTERO .
+
+    FIN             reduce using rule 6 (producto -> PRODUCTO ENTERO CANTIDAD ENTERO .)
+    PRODUCTO        reduce using rule 6 (producto -> PRODUCTO ENTERO CANTIDAD ENTERO .)
+

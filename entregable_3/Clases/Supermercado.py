@@ -2,6 +2,7 @@ class Supermercado:
     def __init__(self):
         self.productos = {}
         self.promociones = {}
+        self.compras = []
 
     def agregar_producto(self, producto):
         if producto.codigo in self.productos:
@@ -22,3 +23,6 @@ class Supermercado:
             raise ValueError(f"No existe un producto con el codigo {codigo}")
 
         return self.productos[codigo]
+
+    def registrar_compra(self, compra):
+        self.compras.append(compra)
