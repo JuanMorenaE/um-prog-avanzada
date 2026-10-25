@@ -1,4 +1,7 @@
 from Clases.DSLSupermercado import DSLSupermercado
+from DSL_Externo_Mantenimiento_Lark.ejecutor import ejecutar_archivo_mantenimiento
+from pprint import pprint
+
 
 def init():
     supermercado = (
@@ -51,12 +54,30 @@ def show_menu(supermercado):
         opcion = int(input("> Opcion: "))
 
         match opcion:
+            case 1:
+                mantenimiento(supermercado)
             case 3:
                 imprimir_lista_productos(supermercado)
             case 4:
                 imprimir_lista_promociones(supermercado)
             case 6:
                 exit()
+
+
+def mantenimiento(supermercado):
+    ruta = "mantenimiento.txt"
+    try:
+        print()
+        aplicadas, errores = ejecutar_archivo_mantenimiento(ruta, supermercado)
+    except FileNotFoundError:
+        print("No se encontro el archivo")
+        return
+
+    print(f"\nInstrucciones aplicadas: {aplicadas}")
+    for error in errores:
+        print("\nErrores:")
+        print(" -", error)
+    
 
 
 def imprimir_lista_productos(supermercado):

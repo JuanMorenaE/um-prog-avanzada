@@ -1,5 +1,5 @@
 from lark import Lark, Transformer, v_args
-from DSL import data
+from Clases.Condicion import Operador
 
 
 # ============================================================
@@ -53,8 +53,8 @@ update_offer_command_list: name discount? conditions?
                         | conditions discount? name?
 
                         
-?delete: "ELIMINAR PRODUCTO" int -> delete_product
-        | "ELIMINAR PROMOCION" int -> delete_offer
+?delete: "ELIMINAR" "PRODUCTO" int -> delete_product
+        | "ELIMINAR" "PROMOCION" int -> delete_offer
 
 conditions: "CUANDO" product_discount_list
 product_discount_list: producto+
@@ -104,17 +104,41 @@ class MantenimientoTransformer(Transformer):
     def discount(self, token):
         return ("discount", token)
     
-    def delete_product(self, token):
-        return ("delete_product", token)
+    def delete_product(self, codigo):
+        return ("delete_product", codigo, {})
+
+    def update_offer_command_list(self, *properties):
+         return dict(properties)
+
+    def update_offer_commands(self, codigo, properties):
+         return ("update_offer", codigo, properties)
 
     def add_product_command_list(self, *properties):
             return dict(properties)
 
+    def add_offer_commands(self, codigo, properties):
+         return ("add_offer", codigo, properties)
+
+    def add_offer_command_list(self, *properties):
+         return dict(properties)
+
+    def conditions(self, token):
+            return ("conditions", token)
+
+    def product_discount_list(self, *productos):
+        return list(productos)
+        
+    def producto(self, codigo, condition=None):
+        if condition is None:
+                return {"codigo": codigo, "condition": {"operator": Operador.IGUAL, "quantity": 1}}
+        else:
+            return {"codigo": codigo, "condition": condition}
+
     def eq(self):
-        return "="
+        return Operador.IGUAL
 
     def ge(self):
-        return ">="
+        return Operador.MAYOR_IGUAL
 
     def quantity(self, operator, quantity):
         return { "operator": operator, "quantity": quantity}
@@ -122,8 +146,8 @@ class MantenimientoTransformer(Transformer):
     def update_product_command_list(self, *properties):
         return dict(properties)
 
-    def delete_offer(self, token):
-        return ("delete_offer", token)
+    def delete_offer(self, codigo):
+        return ("delete_offer", codigo, {})
 
     def add_product_commands(self, codigo, campos):
         return ("add_product", codigo, campos)
@@ -131,9 +155,13 @@ class MantenimientoTransformer(Transformer):
     def update_product_commands(self, codigo, campos):
         return ("update_product", codigo, campos)
 
+    def start(self, *instrucciones):
+        return list(instrucciones)
 
 parser = Lark(grammar, start="start", parser="lalr", transformer=MantenimientoTransformer())
-tree = parser.parse(data)
 
-from pprint import pprint
-print(tree.pretty())
+def interpretar_mantenimiento(data):
+    try:
+        return parser.parse(data)
+    except Exception as error:
+         raise Exception(f"linea {error.line}, columna {error.column}")
