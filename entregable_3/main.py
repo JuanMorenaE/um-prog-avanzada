@@ -93,9 +93,10 @@ def mantenimiento(supermercado):
         return
 
     print(f"\nInstrucciones aplicadas: {aplicadas}")
-    for error in errores:
+    if errores:
         print("\nErrores:")
-        print(" -", error)
+        for error in errores:
+            print(" -", error)
     
 
 
