@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from Clases.DSLSupermercado import DSLSupermercado
 from DSL_Externo_Compras_PLY.parser import interpretar_compras
 from DSL_Externo_Compras_PLY.ejecutor import (
@@ -279,7 +281,7 @@ if __name__ == "__main__":
 
         try:
             compras, errores = ejecutar_archivo_compras(
-                "entregable_3/DSL_Externo_Compras_PLY/compras.txt",
+                Path(__file__).resolve().parent / "datos_prueba" / "compras.txt",
                 supermercado
             )
 
