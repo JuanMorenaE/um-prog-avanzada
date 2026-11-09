@@ -1,0 +1,13 @@
+pipeline {
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Descargando repositorio...'
+                git 
+                    branch: 'develop',
+                    url: 'https://github.com/JuanMorenaE/um-prog-avanzada.git'
+            }
+        }
+    }
+}
+
