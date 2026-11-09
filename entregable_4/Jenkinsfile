@@ -6,8 +6,19 @@ pipeline {
             steps {
                 dir('entregable_4') {
                     echo 'Building and Testing...'
+                    if (isUnix()) {
+                        sh './mvnw -B test'
+                    } else {
+                        bat 'mvnw.cmd -B test'
+                    }
                 }
             }
+        }
+    }
+
+    post {
+        always {
+            junit allowEmptyResults: true, testResults: 'entregable_4/target/surefire-reports/TEST-*.xml'
         }
     }
 }
