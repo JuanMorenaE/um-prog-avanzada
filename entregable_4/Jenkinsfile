@@ -1,11 +1,12 @@
 pipeline {
+    agent any
+
     stages {
-        stage('Checkout') {
+        stage('Build y Test') {
             steps {
-                echo 'Descargando repositorio...'
-                git 
-                    branch: 'develop',
-                    url: 'https://github.com/JuanMorenaE/um-prog-avanzada.git'
+                dir('entregable_4') {
+                    echo 'Building and Testing...'
+                }
             }
         }
     }
