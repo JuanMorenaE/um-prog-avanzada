@@ -1,18 +1,28 @@
+def mvnw(String args) {
+    if (isUnix()) {
+        sh "./mvnw -B ${args}"
+    } else {
+        bat "mvnw.cmd -B ${args}"
+    }
+}
+
 pipeline {
     agent any
 
     stages {
-        stage('Build y Test') {
+        stage('Build') {
+            steps {
+                dir('entregable_4') { 
+                    echo 'Building...'
+                    script { mvnw('clean compile') } 
+                }
+            }
+        }
+        stage('Test') {
             steps {
                 dir('entregable_4') {
-                    echo 'Building and Testing...'
-                    script {
-                        if (isUnix()) {
-                            sh './mvnw -B test'
-                        } else {
-                            bat 'mvnw.cmd -B test'
-                        }
-                    }
+                    echo 'Testing...'
+                    script { mvnw('test') }
                 }
             }
         }
