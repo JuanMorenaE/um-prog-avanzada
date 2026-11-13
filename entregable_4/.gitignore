@@ -37,3 +37,6 @@ build/
 /.tools/
 /.m2/
 *.log
+### Ambientes simulados ###
+ambientes/
+.env

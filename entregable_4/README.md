@@ -22,7 +22,7 @@ sh mvnw clean verify
 java -jar target/mini-web-0.0.1-SNAPSHOT.jar
 ```
 
-Abrir **http://localhost:8080**. Detener con `Ctrl+C`.
+Abrir **http://localhost:8081**. El puerto 8080 queda reservado para Jenkins. Detener con `Ctrl+C`.
 También se puede ejecutar directamente con `mvnw.cmd spring-boot:run` (Windows) o `sh mvnw spring-boot:run`.
 
 No requiere Node, una base de datos instalada ni servicios de imágenes o fuentes externos. Thymeleaf renderiza las páginas en el servidor. El JavaScript solo mejora la vista previa de portada: los formularios funcionan sin él.
@@ -62,7 +62,7 @@ La base se guarda en `data/sidequest.mv.db`, relativa a la carpeta desde la que 
 Para entornos separados, elegir un puerto y una ubicación distinta de la base:
 
 ```powershell
-java -jar target/mini-web-0.0.1-SNAPSHOT.jar --server.port=8081 --spring.datasource.url=jdbc:h2:file:./data-uat/sidequest
+java -jar target/mini-web-0.0.1-SNAPSHOT.jar --server.port=8082 --spring.datasource.url=jdbc:h2:file:./data-uat/sidequest
 ```
 
 Se admiten las variables `PORT` y `DB_URL`. No iniciar dos procesos con el mismo archivo H2. No versionar ni incluir `data/`, `.m2/` o `target/` en la entrega de código fuente.
@@ -73,7 +73,7 @@ Se admiten las variables `PORT` y `DB_URL`. No iniciar dos procesos con el mismo
 
 La suite contiene pruebas unitarias de ambos servicios y pruebas de integración con MockMvc, Thymeleaf y H2 reales: creación de género y juego, búsqueda combinada, renderizado de páginas, recursos estáticos, validaciones, género inexistente, búsqueda sin resultados y HTTP 404. No hay dependencias de sistemas externos en las pruebas.
 
-Este directorio implementa la aplicación. El pipeline Jenkins y la configuración del disparador GitHub corresponden a la integración de CI/CD del equipo.
+El `Jenkinsfile` del equipo compila, ejecuta las pruebas y empaqueta la aplicación; luego despliega el mismo JAR en UAT (8082) y, tras la aprobación manual, en producción (8083). Cada ambiente inicia Java desde su propia carpeta, por lo que el archivo H2 también queda separado. El desarrollo local usa 8081 y Jenkins usa 8080. El disparador consulta GitHub cada minuto.
 
 ## Recorrido para la presentación
 

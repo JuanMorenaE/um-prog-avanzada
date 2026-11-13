@@ -1,0 +1,183 @@
+def mvnw(String args) {
+    if (isUnix()) {
+        sh "./mvnw -B ${args}"
+    } else {
+        bat "mvnw.cmd -B ${args}"
+    }
+}
+
+def deploy(String ambiente, String puerto) {
+    withEnv(["CARPETA=${env.AMBIENTES_DIR}/${ambiente}", "PUERTO=${puerto}"]) {
+
+        // 1. Crear la carpeta del ambiente (si no existe)
+        if (isUnix()) {
+            sh 'mkdir -p "$CARPETA"'
+        } else {
+            powershell 'New-Item -ItemType Directory -Force -Path $env:CARPETA | Out-Null'
+        }
+
+
+        // 2. Bajar la versión anterior (si había una corriendo)
+        if (isUnix()) {
+            sh '''
+                if [ -f "$CARPETA/app.pid" ]; then
+                    kill $(cat "$CARPETA/app.pid") || true
+                    sleep 3
+                fi
+            '''
+        } else {
+            powershell '''
+                $pidFile = Join-Path $env:CARPETA 'app.pid'
+                if (Test-Path $pidFile) {
+                    $oldPid = [int](Get-Content $pidFile -Raw).Trim()
+                    try {
+                        $proc = Get-Process -Id $oldPid -ErrorAction Stop
+                        if ($proc.ProcessName -eq 'java') {
+                            Stop-Process -Id $oldPid -Force -ErrorAction Stop
+                        }
+                    } catch { }
+                    Start-Sleep -Seconds 3
+                }
+            '''
+        }
+
+        // 3. Copiar el jar nuevo a la carpeta
+        if (isUnix()) {
+            sh 'cp entregable_4/target/mini-web-0.0.1-SNAPSHOT.jar "$CARPETA/app.jar"'
+        } else {
+            powershell 'Copy-Item -Path "entregable_4/target/mini-web-0.0.1-SNAPSHOT.jar" -Destination (Join-Path $env:CARPETA "app.jar") -Force'
+        }
+
+        // 4. Levantar la app en segundo plano y guardar su PID
+        if (isUnix()) {
+            sh '''
+                cd "$CARPETA"
+                JENKINS_NODE_COOKIE=dontKillMe nohup java -jar app.jar --server.port=$PUERTO > app.log 2>&1 &
+                echo $! > app.pid
+            '''
+        } else {
+            powershell '''
+                $env:JENKINS_NODE_COOKIE = 'dontKillMe'
+                $env:BUILD_ID = 'dontKillMe'
+
+                $proc = Start-Process -FilePath 'java' `
+                    -ArgumentList '-jar', 'app.jar', "--server.port=$env:PUERTO", '--logging.file.name=app.log' `
+                    -WorkingDirectory $env:CARPETA `
+                    -WindowStyle Hidden `
+                    -PassThru
+
+                Set-Content -Path (Join-Path $env:CARPETA 'app.pid') -Value $proc.Id -NoNewline -Encoding ascii
+            '''
+        }
+
+        // 5. Esperar a que la app responda (máx. 60 segundos)
+        if (isUnix()) {
+            timeout(time: 60, unit: 'SECONDS') {
+                waitUntil {
+                    sh(script: 'curl -sf "http://localhost:$PUERTO/actuator/health"', returnStatus: true) == 0
+                }
+            }
+        } else {
+            timeout(time: 60, unit: 'SECONDS') {
+                waitUntil {
+                    powershell(script: '''
+                        try {
+                            Invoke-WebRequest -UseBasicParsing -TimeoutSec 5 -Uri "http://localhost:$env:PUERTO/actuator/health" | Out-Null
+                            exit 0
+                        } catch {
+                            exit 1
+                        }
+                    ''', returnStatus: true) == 0
+                }
+            }
+        }
+
+        echo "App levantada en ${ambiente}: http://localhost:${puerto}"
+    }
+}
+
+pipeline {
+    agent any
+
+    triggers {
+        pollSCM('* * * * *')
+    }
+
+    options {
+        disableConcurrentBuilds()
+        skipDefaultCheckout()
+    }
+
+    environment {
+        AMBIENTES_DIR = '/Users/juanmorenae/universidad-de-montevideo/programacion-avanzada/entregables/entregable_4/ambientes'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Bajando el código de GitHub...'
+                checkout scm
+            }
+        }
+
+        stage('Compilación') {
+            steps {
+                dir('entregable_4') { 
+                    echo 'Building...'
+                    script { mvnw('clean compile') } 
+                }
+            }
+        }
+
+        stage('Testing') {
+            steps {
+                dir('entregable_4') {
+                    echo 'Testing...'
+                    script { mvnw('test') }
+                }
+            }
+        }
+
+        stage('Empaquetado') {
+            steps {
+                dir('entregable_4') {
+                    echo 'Packaging...'
+                    script { mvnw('package -DskipTests') }
+                }
+            }
+        }
+
+        stage('Deploy UAT') {
+            steps {
+                script { deploy('uat', '8082') }
+            }
+        }
+
+        stage('Aprobación') {
+            steps {
+                timeout(time: 30, unit: 'MINUTES') {
+                    input message: 'Probar la app en http://localhost:8082. ¿Está todo OK para pasar a Producción?',
+                          ok: 'Aprobar'
+                }
+            }
+        }
+
+        stage('Deploy Producción') {
+            steps {
+                script { deploy('prod', '8083') }
+            }
+        }
+    }
+
+    post {
+        always {
+            junit allowEmptyResults: true, testResults: 'entregable_4/target/surefire-reports/TEST-*.xml'
+        }
+        success {
+            echo 'Versión desplegada en Producción: http://localhost:8083'
+        }
+        aborted {
+            echo 'Rechazado en UAT (o sin respuesta). Producción no se tocó.'
+        }
+    }
+}
