@@ -32,7 +32,11 @@ build/
 ### VS Code ###
 .vscode/
 
-
+### Local runtime ###
+/data/
+/.tools/
+/.m2/
+*.log
 ### Ambientes simulados ###
 ambientes/
 .env
