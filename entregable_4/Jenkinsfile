@@ -31,7 +31,6 @@ def deploy(String ambiente, String puerto) {
                 if (Test-Path $pidFile) {
                     $oldPid = [int](Get-Content $pidFile -Raw).Trim()
                     try {
-                        # Solo matamos el proceso si sigue vivo y es un java (por si el PID fue reutilizado)
                         $proc = Get-Process -Id $oldPid -ErrorAction Stop
                         if ($proc.ProcessName -eq 'java') {
                             Stop-Process -Id $oldPid -Force -ErrorAction Stop
@@ -58,16 +57,12 @@ def deploy(String ambiente, String puerto) {
             '''
         } else {
             powershell '''
-                # Evita que Jenkins mate el proceso java cuando termina el step
                 $env:JENKINS_NODE_COOKIE = 'dontKillMe'
                 $env:BUILD_ID = 'dontKillMe'
 
-                # Start-Process no permite stdout y stderr al mismo archivo, por eso van separados
                 $proc = Start-Process -FilePath 'java' `
-                    -ArgumentList '-jar', 'app.jar', "--server.port=$env:PUERTO" `
+                    -ArgumentList '-jar', 'app.jar', "--server.port=$env:PUERTO", '--logging.file.name=app.log' `
                     -WorkingDirectory $env:CARPETA `
-                    -RedirectStandardOutput (Join-Path $env:CARPETA 'app.log') `
-                    -RedirectStandardError (Join-Path $env:CARPETA 'app-error.log') `
                     -WindowStyle Hidden `
                     -PassThru
 
