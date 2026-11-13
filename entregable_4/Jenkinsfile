@@ -57,7 +57,14 @@ pipeline {
     }
 
     stages {
-        stage('Build') {
+        stage('Checkout') {
+            steps {
+                echo 'Bajando el código de GitHub...'
+                checkout scm
+            }
+        }
+
+        stage('Compilación') {
             steps {
                 dir('entregable_4') { 
                     echo 'Building...'
@@ -66,7 +73,7 @@ pipeline {
             }
         }
 
-        stage('Test') {
+        stage('Testing') {
             steps {
                 dir('entregable_4') {
                     echo 'Testing...'
@@ -75,7 +82,7 @@ pipeline {
             }
         }
 
-        stage('Package') {
+        stage('Empaquetado') {
             steps {
                 dir('entregable_4') {
                     echo 'Packaging...'
