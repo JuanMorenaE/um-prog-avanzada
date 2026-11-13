@@ -9,6 +9,10 @@ def mvnw(String args) {
 pipeline {
     agent any
 
+    triggers {
+        pollSCM('H/2 * * * *')
+    }
+
     stages {
         stage('Build') {
             steps {
@@ -18,11 +22,21 @@ pipeline {
                 }
             }
         }
+
         stage('Test') {
             steps {
                 dir('entregable_4') {
                     echo 'Testing...'
                     script { mvnw('test') }
+                }
+            }
+        }
+
+        stage('Package') {
+            steps {
+                dir('entregable_4') {
+                    echo 'Packaging...'
+                    script { mvnw('package') }
                 }
             }
         }
