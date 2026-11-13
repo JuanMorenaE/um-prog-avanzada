@@ -6,11 +6,54 @@ def mvnw(String args) {
     }
 }
 
+def deploy(String ambiente, String puerto) {
+    withEnv(["CARPETA=${env.AMBIENTES_DIR}/${ambiente}", "PUERTO=${puerto}"]) {
+
+        // 1. Crear la carpeta del ambiente (si no existe)
+        sh 'mkdir -p "$CARPETA"'
+
+        // 2. Bajar la versión anterior (si había una corriendo)
+        sh '''
+            if [ -f "$CARPETA/app.pid" ]; then
+                kill $(cat "$CARPETA/app.pid") || true
+                sleep 3
+            fi
+        '''
+
+        // 3. Copiar el jar nuevo a la carpeta
+        sh 'cp entregable_4/target/mini-web-0.0.1-SNAPSHOT.jar "$CARPETA/app.jar"'
+
+        // 4. Levantar la app en segundo plano y guardar su PID
+        sh '''
+            cd "$CARPETA"
+            JENKINS_NODE_COOKIE=dontKillMe nohup java -jar app.jar --server.port=$PUERTO > app.log 2>&1 &
+            echo $! > app.pid
+        '''
+
+        // 5. Esperar a que la app responda (máx. 60 segundos)
+        timeout(time: 60, unit: 'SECONDS') {
+            waitUntil {
+                sh(script: 'curl -sf "http://localhost:$PUERTO/actuator/health"', returnStatus: true) == 0
+            }
+        }
+
+        echo "App levantada en ${ambiente}: http://localhost:${puerto}"
+    }
+}
+
 pipeline {
     agent any
 
     triggers {
         pollSCM('H/2 * * * *')
+    }
+
+    options {
+        disableConcurrentBuilds() 
+    }
+
+    environment {
+        AMBIENTES_DIR = '/Users/juanmorenae/universidad-de-montevideo/programacion-avanzada/entregables/entregable_4/ambientes'
     }
 
     stages {
@@ -36,8 +79,29 @@ pipeline {
             steps {
                 dir('entregable_4') {
                     echo 'Packaging...'
-                    script { mvnw('package') }
+                    script { mvnw('package -DskipTests') }
                 }
+            }
+        }
+
+        stage('Deploy UAT') {
+            steps {
+                script { deploy('uat', '8082') }
+            }
+        }
+
+        stage('Aprobación') {
+            steps {
+                timeout(time: 30, unit: 'MINUTES') {
+                    input message: 'Probar la app en http://localhost:8082. ¿Está todo OK para pasar a Producción?',
+                          ok: 'Aprobar'
+                }
+            }
+        }
+
+        stage('Deploy Producción') {
+            steps {
+                script { deploy('prod', '8083') }
             }
         }
     }
@@ -45,6 +109,12 @@ pipeline {
     post {
         always {
             junit allowEmptyResults: true, testResults: 'entregable_4/target/surefire-reports/TEST-*.xml'
+        }
+        success {
+            echo 'Versión desplegada en Producción: http://localhost:8083'
+        }
+        aborted {
+            echo 'Rechazado en UAT (o sin respuesta). Producción no se tocó.'
         }
     }
 }
