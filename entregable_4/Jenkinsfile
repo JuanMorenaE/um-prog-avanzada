@@ -10,30 +10,90 @@ def deploy(String ambiente, String puerto) {
     withEnv(["CARPETA=${env.AMBIENTES_DIR}/${ambiente}", "PUERTO=${puerto}"]) {
 
         // 1. Crear la carpeta del ambiente (si no existe)
-        sh 'mkdir -p "$CARPETA"'
+        if (isUnix()) {
+            sh 'mkdir -p "$CARPETA"'
+        } else {
+            powershell 'New-Item -ItemType Directory -Force -Path $env:CARPETA | Out-Null'
+        }
+
 
         // 2. Bajar la versión anterior (si había una corriendo)
-        sh '''
-            if [ -f "$CARPETA/app.pid" ]; then
-                kill $(cat "$CARPETA/app.pid") || true
-                sleep 3
-            fi
-        '''
+        if (isUnix()) {
+            sh '''
+                if [ -f "$CARPETA/app.pid" ]; then
+                    kill $(cat "$CARPETA/app.pid") || true
+                    sleep 3
+                fi
+            '''
+        } else {
+            powershell '''
+                $pidFile = Join-Path $env:CARPETA 'app.pid'
+                if (Test-Path $pidFile) {
+                    $oldPid = [int](Get-Content $pidFile -Raw).Trim()
+                    try {
+                        # Solo matamos el proceso si sigue vivo y es un java (por si el PID fue reutilizado)
+                        $proc = Get-Process -Id $oldPid -ErrorAction Stop
+                        if ($proc.ProcessName -eq 'java') {
+                            Stop-Process -Id $oldPid -Force -ErrorAction Stop
+                        }
+                    } catch { }
+                    Start-Sleep -Seconds 3
+                }
+            '''
+        }
 
         // 3. Copiar el jar nuevo a la carpeta
-        sh 'cp entregable_4/target/mini-web-0.0.1-SNAPSHOT.jar "$CARPETA/app.jar"'
+        if (isUnix()) {
+            sh 'cp entregable_4/target/mini-web-0.0.1-SNAPSHOT.jar "$CARPETA/app.jar"'
+        } else {
+            powershell 'Copy-Item -Path "entregable_4/target/mini-web-0.0.1-SNAPSHOT.jar" -Destination (Join-Path $env:CARPETA "app.jar") -Force'
+        }
 
         // 4. Levantar la app en segundo plano y guardar su PID
-        sh '''
-            cd "$CARPETA"
-            JENKINS_NODE_COOKIE=dontKillMe nohup java -jar app.jar --server.port=$PUERTO > app.log 2>&1 &
-            echo $! > app.pid
-        '''
+        if (isUnix()) {
+            sh '''
+                cd "$CARPETA"
+                JENKINS_NODE_COOKIE=dontKillMe nohup java -jar app.jar --server.port=$PUERTO > app.log 2>&1 &
+                echo $! > app.pid
+            '''
+        } else {
+            powershell '''
+                # Evita que Jenkins mate el proceso java cuando termina el step
+                $env:JENKINS_NODE_COOKIE = 'dontKillMe'
+                $env:BUILD_ID = 'dontKillMe'
+
+                # Start-Process no permite stdout y stderr al mismo archivo, por eso van separados
+                $proc = Start-Process -FilePath 'java' `
+                    -ArgumentList '-jar', 'app.jar', "--server.port=$env:PUERTO" `
+                    -WorkingDirectory $env:CARPETA `
+                    -RedirectStandardOutput (Join-Path $env:CARPETA 'app.log') `
+                    -RedirectStandardError (Join-Path $env:CARPETA 'app-error.log') `
+                    -WindowStyle Hidden `
+                    -PassThru
+
+                Set-Content -Path (Join-Path $env:CARPETA 'app.pid') -Value $proc.Id -NoNewline -Encoding ascii
+            '''
+        }
 
         // 5. Esperar a que la app responda (máx. 60 segundos)
-        timeout(time: 60, unit: 'SECONDS') {
-            waitUntil {
-                sh(script: 'curl -sf "http://localhost:$PUERTO/actuator/health"', returnStatus: true) == 0
+        if (isUnix()) {
+            timeout(time: 60, unit: 'SECONDS') {
+                waitUntil {
+                    sh(script: 'curl -sf "http://localhost:$PUERTO/actuator/health"', returnStatus: true) == 0
+                }
+            }
+        } else {
+            timeout(time: 60, unit: 'SECONDS') {
+                waitUntil {
+                    powershell(script: '''
+                        try {
+                            Invoke-WebRequest -UseBasicParsing -TimeoutSec 5 -Uri "http://localhost:$env:PUERTO/actuator/health" | Out-Null
+                            exit 0
+                        } catch {
+                            exit 1
+                        }
+                    ''', returnStatus: true) == 0
+                }
             }
         }
 
