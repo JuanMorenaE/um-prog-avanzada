@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
+
 <head th:replace="~{fragments :: head('Juegos')}"></head>
+
 <body>
     <div class="shell">
         <header th:replace="~{fragments :: header('catalog')}"></header>
@@ -11,7 +13,7 @@
             <!-- Juego destacado -->
             <section class="hero featured-hero" aria-labelledby="hero-title" th:if="${featured != null}">
                 <div class="hero-copy">
-                    <span class="featured-label">Destacado</span>
+                    <span class="featured-label">Proximamente</span>
                     <h1 id="hero-title">Grand Theft Auto<br><em>VI.</em></h1>
                     <p class="featured-description" th:text="${featured.description}"></p>
                     <div class="featured-info">
@@ -39,17 +41,17 @@
                     <label class="search">
                         <span aria-hidden="true">⌕</span>
                         <input type="search" name="q" th:value="${q}" placeholder="Buscar juego o estudio…"
-                               aria-label="Buscar por título o estudio" maxlength="80">
+                            aria-label="Buscar por título o estudio" maxlength="80">
                     </label>
                     <label class="sr-only" for="genre">Filtrar por género</label>
                     <select id="genre" name="genre">
                         <option value="">Todos los géneros</option>
                         <option th:each="genre : ${genres}" th:value="${genre.id}" th:text="${genre.name}"
-                                th:selected="${selectedGenre == genre.id}"></option>
+                            th:selected="${selectedGenre == genre.id}"></option>
                     </select>
                     <button class="button" type="submit">Explorar ↗</button>
-                    <a class="reset" th:if="${!q.isEmpty() or selectedGenre != null}"
-                       th:href="@{/#coleccion}">Limpiar filtros</a>
+                    <a class="reset" th:if="${!q.isEmpty() or selectedGenre != null}" th:href="@{/#coleccion}">Limpiar
+                        filtros</a>
                 </form>
 
                 <div class="results-line">
@@ -58,9 +60,9 @@
 
                 <div class="game-grid" th:unless="${#lists.isEmpty(games)}">
                     <article class="game-card" th:each="game : ${games}"
-                             th:classappend="${game.featured} ? 'featured-card'">
+                        th:classappend="${game.featured} ? 'featured-card'">
                         <a th:href="@{/juegos/{id}(id=${game.id})}" class="cover-link"
-                           th:aria-label="'Ver ' + ${game.title}">
+                            th:aria-label="'Ver ' + ${game.title}">
                             <img th:src="@{${game.coverPath}}" th:alt="'Portada de ' + ${game.title}" loading="lazy">
                             <span class="cover-genre" th:text="${game.genre.name}"></span>
                             <span class="cover-featured" th:if="${game.featured}">Destacado</span>
@@ -90,4 +92,5 @@
         <footer th:replace="~{fragments :: footer}"></footer>
     </div>
 </body>
+
 </html>
