@@ -1,3 +1,49 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org"><head th:replace="~{fragments :: head(${game.title})}"></head><body><div class="shell"><header th:replace="~{fragments :: header('catalog')}"></header>
-<main class="inner-page"><div th:replace="~{fragments :: notice}"></div><a class="back" th:href="@{/#coleccion}">← Volver a juegos</a><div class="detail-layout"><div class="detail-cover"><img th:src="@{${game.coverPath}}" th:alt="'Portada de ' + ${game.title}"></div><section class="detail-copy"><span class="featured-label" th:if="${game.featured}">Destacado</span><span class="tag" th:text="${game.genre.name}"></span><h1 th:text="${game.title}"></h1><p class="synopsis" th:text="${game.description}"></p><dl class="game-facts"><div><dt>Estudio</dt><dd th:text="${game.studio}"></dd></div><div><dt>Lanzamiento</dt><dd th:text="${game.releaseLabel}"></dd></div><div><dt>Plataforma</dt><dd th:text="${game.platform}"></dd></div></dl><div class="detail-actions"><a class="text-link" th:href="@{/(genre=${game.genre.id})}">Más juegos de este género ↗</a><a class="text-link" th:if="${game.officialUrl != null}" th:href="${game.officialUrl}" target="_blank" rel="noopener noreferrer">Sitio oficial ↗</a></div></section></div></main><footer th:replace="~{fragments :: footer}"></footer></div></body></html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(${game.title})}"></head>
+<body>
+    <div class="shell">
+        <header th:replace="~{fragments :: header('catalog')}"></header>
+
+        <main class="inner-page">
+            <div th:replace="~{fragments :: notice}"></div>
+            <a class="back" th:href="@{/#coleccion}">← Volver a juegos</a>
+
+            <div class="detail-layout">
+                <div class="detail-cover">
+                    <img th:src="@{${game.coverPath}}" th:alt="'Portada de ' + ${game.title}">
+                </div>
+
+                <section class="detail-copy">
+                    <span class="featured-label" th:if="${game.featured}">Destacado</span><span class="tag" th:text="${game.genre.name}"></span>
+                    <h1 th:text="${game.title}"></h1>
+                    <p class="synopsis" th:text="${game.description}"></p>
+
+                    <dl class="game-facts">
+                        <div>
+                            <dt>Estudio</dt>
+                            <dd th:text="${game.studio}"></dd>
+                        </div>
+                        <div>
+                            <dt>Lanzamiento</dt>
+                            <dd th:text="${game.releaseLabel}"></dd>
+                        </div>
+                        <div>
+                            <dt>Plataforma</dt>
+                            <dd th:text="${game.platform}"></dd>
+                        </div>
+                    </dl>
+
+                    <div class="detail-actions">
+                        <a class="text-link" th:href="@{/(genre=${game.genre.id})}">Más juegos de este género ↗</a>
+                        <a class="text-link" th:if="${game.officialUrl != null}" th:href="${game.officialUrl}"
+                           target="_blank" rel="noopener noreferrer">Sitio oficial ↗</a>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <footer th:replace="~{fragments :: footer}"></footer>
+    </div>
+</body>
+</html>

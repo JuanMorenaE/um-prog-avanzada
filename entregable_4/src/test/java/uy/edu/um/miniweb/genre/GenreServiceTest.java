@@ -9,19 +9,29 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class GenreServiceTest {
-    @Mock GenreRepository repository;
-    @InjectMocks GenreService service;
-    @Test void trimsNamesBeforeSaving() {
+
+    @Mock
+    GenreRepository repository;
+
+    @InjectMocks
+    GenreService service;
+
+    @Test
+    void trimsNamesBeforeSaving() {
         when(repository.save(any())).thenAnswer(i -> i.getArgument(0));
         assertEquals("Estrategia", service.create("  Estrategia  ").getName());
         verify(repository).existsByNameIgnoreCase("Estrategia");
     }
-    @Test void rejectsDuplicateNamesIgnoringCase() {
+
+    @Test
+    void rejectsDuplicateNamesIgnoringCase() {
         when(repository.existsByNameIgnoreCase("rpg")).thenReturn(true);
         assertThrows(IllegalArgumentException.class, () -> service.create("rpg"));
         verify(repository, never()).save(any());
     }
-    @Test void rejectsBlankAndLongNames() {
+
+    @Test
+    void rejectsBlankAndLongNames() {
         assertThrows(IllegalArgumentException.class, () -> service.create("  "));
         assertThrows(IllegalArgumentException.class, () -> service.create("x".repeat(41)));
         verifyNoInteractions(repository);

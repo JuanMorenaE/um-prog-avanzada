@@ -12,27 +12,39 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class GameServiceTest {
-    @Mock GameRepository repository;
-    @Mock GenreService genres;
-    @InjectMocks GameService service;
-    @Test void createsGameLinkedToExistingGenre() {
+    @Mock
+    GameRepository repository;
+    @Mock
+    GenreService genres;
+    @InjectMocks
+    GameService service;
+
+    @Test
+    void createsGameLinkedToExistingGenre() {
         Genre genre = new Genre("Aventura");
         when(genres.get(1L)).thenReturn(genre);
         when(repository.save(any())).thenAnswer(i -> i.getArgument(0));
         GameForm f = new GameForm();
-        f.setTitle("  Un mundo  "); f.setDescription(" Historia "); f.setStudio(" Estudio "); f.setGenreId(1L);
+        f.setTitle("  Un mundo  ");
+        f.setDescription(" Historia ");
+        f.setStudio(" Estudio ");
+        f.setGenreId(1L);
         Game game = service.create(f);
         assertEquals("Un mundo", game.getTitle());
         assertEquals("Historia", game.getDescription());
         assertSame(genre, game.getGenre());
     }
-    @Test void normalizesSearchAndPassesGenreFilter() {
+
+    @Test
+    void normalizesSearchAndPassesGenreFilter() {
         service.search("  ORBIT  ", 3L);
         verify(repository).search("ORBIT", 3L);
         service.search(null, null);
         verify(repository).search("", null);
     }
-    @Test void missingGameReturnsNotFound() {
+
+    @Test
+    void missingGameReturnsNotFound() {
         when(repository.findById(999L)).thenReturn(Optional.empty());
         assertEquals(404, assertThrows(ResponseStatusException.class, () -> service.get(999L)).getStatusCode().value());
     }

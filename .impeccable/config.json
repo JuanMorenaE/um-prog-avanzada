@@ -1,0 +1,35 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "entregable_4/src/main/resources/templates/game-detail.html"
+        ],
+        "createdAt": "2026-11-15T23:14:09.890Z",
+        "reason": "Claude: Thymeleaf template, src is set at render time via th:src; CatalogIntegrationTest.rendersAllScreensAndLocalAssets checks covers return 200"
+      },
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "entregable_4/src/main/resources/templates/game-form.html"
+        ],
+        "createdAt": "2026-11-15T23:14:10.099Z",
+        "reason": "Claude: Thymeleaf template, src is set at render time via th:src; CatalogIntegrationTest.rendersAllScreensAndLocalAssets checks covers return 200"
+      },
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "entregable_4/src/main/resources/templates/index.html"
+        ],
+        "createdAt": "2026-11-15T23:14:10.311Z",
+        "reason": "Claude: Thymeleaf template, src is set at render time via th:src; CatalogIntegrationTest.rendersAllScreensAndLocalAssets checks covers return 200"
+      }
+    ]
+  }
+}

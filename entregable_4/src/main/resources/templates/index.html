@@ -1,23 +1,93 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments :: head('Juegos')}"></head>
-<body><div class="shell"><header th:replace="~{fragments :: header('catalog')}"></header>
-<main><div th:replace="~{fragments :: notice}"></div>
-<section class="hero featured-hero" aria-labelledby="hero-title" th:if="${featured != null}">
-<div class="hero-copy"><span class="featured-label">Destacado</span><h1 id="hero-title">Grand Theft Auto<br><em>VI.</em></h1>
-<p class="featured-description" th:text="${featured.description}"></p>
-<div class="featured-info"><span>PlayStation 5</span><span th:text="${featured.releaseLabel}"></span></div>
-<div class="hero-actions"><a class="button light" th:href="@{/juegos/{id}(id=${featured.id})}">Ver GTA VI ↗</a><a href="#coleccion" class="text-link">Todos los juegos ↓</a></div></div>
-<a class="hero-art" th:href="@{/juegos/{id}(id=${featured.id})}" aria-label="Ver Grand Theft Auto VI"><img th:src="@{${featured.coverPath}}" alt="Grand Theft Auto VI" fetchpriority="high"></a>
-</section>
-<section id="coleccion" class="collection" aria-labelledby="collection-title">
-<div class="section-heading"><h2 id="collection-title">Juegos</h2><p class="collection-note" th:text="${total} + ' en el catálogo'"></p></div>
-<form method="get" th:action="@{/}" class="filterbar" role="search"><label class="search"><span aria-hidden="true">⌕</span><input type="search" name="q" th:value="${q}" placeholder="Buscar juego o estudio…" aria-label="Buscar por título o estudio" maxlength="80"></label><label class="sr-only" for="genre">Filtrar por género</label><select id="genre" name="genre"><option value="">Todos los géneros</option><option th:each="genre : ${genres}" th:value="${genre.id}" th:text="${genre.name}" th:selected="${selectedGenre == genre.id}"></option></select><button class="button" type="submit">Explorar ↗</button><a class="reset" th:if="${!q.isEmpty() or selectedGenre != null}" th:href="@{/#coleccion}">Limpiar filtros</a></form>
-<div class="results-line"><span th:text="${#lists.size(games)} + ' juegos'"></span></div>
-<div class="game-grid" th:unless="${#lists.isEmpty(games)}">
-<article class="game-card" th:each="game : ${games}" th:classappend="${game.featured} ? 'featured-card'">
-<a th:href="@{/juegos/{id}(id=${game.id})}" class="cover-link" th:aria-label="'Ver ' + ${game.title}"><img th:src="@{${game.coverPath}}" th:alt="'Portada de ' + ${game.title}" loading="lazy"><span class="cover-genre" th:text="${game.genre.name}"></span><span class="cover-featured" th:if="${game.featured}">Destacado</span><span class="cover-arrow" aria-hidden="true">↗</span></a>
-<div class="card-meta"><span th:text="${game.studio}"></span><span th:text="${game.releaseYear}"></span></div><h3><a th:href="@{/juegos/{id}(id=${game.id})}" th:text="${game.title}"></a></h3><p class="card-description" th:text="${game.description}"></p><div class="card-bottom"><span th:text="${game.platform}"></span><span th:if="${game.upcoming}" th:text="${game.releaseLabel}"></span></div></article></div>
-<div class="empty-state" th:if="${#lists.isEmpty(games)}"><h3>No se encontraron juegos.</h3><p>Probá con otro nombre o género.</p><a class="button" th:href="@{/#coleccion}">Ver todos los juegos</a></div>
-</section>
-</main><footer th:replace="~{fragments :: footer}"></footer></div></body></html>
+<body>
+    <div class="shell">
+        <header th:replace="~{fragments :: header('catalog')}"></header>
+
+        <main>
+            <div th:replace="~{fragments :: notice}"></div>
+
+            <!-- Juego destacado -->
+            <section class="hero featured-hero" aria-labelledby="hero-title" th:if="${featured != null}">
+                <div class="hero-copy">
+                    <span class="featured-label">Destacado</span>
+                    <h1 id="hero-title">Grand Theft Auto<br><em>VI.</em></h1>
+                    <p class="featured-description" th:text="${featured.description}"></p>
+                    <div class="featured-info">
+                        <span>PlayStation 5</span>
+                        <span th:text="${featured.releaseLabel}"></span>
+                    </div>
+                    <div class="hero-actions">
+                        <a class="button light" th:href="@{/juegos/{id}(id=${featured.id})}">Ver GTA VI ↗</a>
+                        <a href="#coleccion" class="text-link">Todos los juegos ↓</a>
+                    </div>
+                </div>
+                <a class="hero-art" th:href="@{/juegos/{id}(id=${featured.id})}" aria-label="Ver Grand Theft Auto VI">
+                    <img th:src="@{${featured.coverPath}}" alt="Grand Theft Auto VI" fetchpriority="high">
+                </a>
+            </section>
+
+            <!-- Catálogo -->
+            <section id="coleccion" class="collection" aria-labelledby="collection-title">
+                <div class="section-heading">
+                    <h2 id="collection-title">Juegos</h2>
+                    <p class="collection-note" th:text="${total} + ' en el catálogo'"></p>
+                </div>
+
+                <form method="get" th:action="@{/}" class="filterbar" role="search">
+                    <label class="search">
+                        <span aria-hidden="true">⌕</span>
+                        <input type="search" name="q" th:value="${q}" placeholder="Buscar juego o estudio…"
+                               aria-label="Buscar por título o estudio" maxlength="80">
+                    </label>
+                    <label class="sr-only" for="genre">Filtrar por género</label>
+                    <select id="genre" name="genre">
+                        <option value="">Todos los géneros</option>
+                        <option th:each="genre : ${genres}" th:value="${genre.id}" th:text="${genre.name}"
+                                th:selected="${selectedGenre == genre.id}"></option>
+                    </select>
+                    <button class="button" type="submit">Explorar ↗</button>
+                    <a class="reset" th:if="${!q.isEmpty() or selectedGenre != null}"
+                       th:href="@{/#coleccion}">Limpiar filtros</a>
+                </form>
+
+                <div class="results-line">
+                    <span th:text="${#lists.size(games)} + ' juegos'"></span>
+                </div>
+
+                <div class="game-grid" th:unless="${#lists.isEmpty(games)}">
+                    <article class="game-card" th:each="game : ${games}"
+                             th:classappend="${game.featured} ? 'featured-card'">
+                        <a th:href="@{/juegos/{id}(id=${game.id})}" class="cover-link"
+                           th:aria-label="'Ver ' + ${game.title}">
+                            <img th:src="@{${game.coverPath}}" th:alt="'Portada de ' + ${game.title}" loading="lazy">
+                            <span class="cover-genre" th:text="${game.genre.name}"></span>
+                            <span class="cover-featured" th:if="${game.featured}">Destacado</span>
+                            <span class="cover-arrow" aria-hidden="true">↗</span>
+                        </a>
+                        <div class="card-meta">
+                            <span th:text="${game.studio}"></span>
+                            <span th:text="${game.releaseYear}"></span>
+                        </div>
+                        <h3><a th:href="@{/juegos/{id}(id=${game.id})}" th:text="${game.title}"></a></h3>
+                        <p class="card-description" th:text="${game.description}"></p>
+                        <div class="card-bottom">
+                            <span th:text="${game.platform}"></span>
+                            <span th:if="${game.upcoming}" th:text="${game.releaseLabel}"></span>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="empty-state" th:if="${#lists.isEmpty(games)}">
+                    <h3>No se encontraron juegos.</h3>
+                    <p>Probá con otro nombre o género.</p>
+                    <a class="button" th:href="@{/#coleccion}">Ver todos los juegos</a>
+                </div>
+            </section>
+        </main>
+
+        <footer th:replace="~{fragments :: footer}"></footer>
+    </div>
+</body>
+</html>

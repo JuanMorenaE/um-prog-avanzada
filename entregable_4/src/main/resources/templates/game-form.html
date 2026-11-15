@@ -1,15 +1,91 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org"><head th:replace="~{fragments :: head('Agregar juego')}"></head><body><div class="shell"><header th:replace="~{fragments :: header('')}"></header>
-<main class="inner-page"><a class="back" th:href="@{/}">← Volver a juegos</a><h1>Agregar <em>juego.</em></h1>
-<div class="form-layout"><aside class="form-aside"><img th:src="@{/images/orbit.svg}" alt="Vista previa de portada" id="cover-preview"><small>Todos los campos son obligatorios.</small></aside>
-<form class="editor-form" method="post" th:action="@{/juegos}" th:object="${gameForm}">
-<div class="field"><label for="title">Nombre del juego</label><input id="title" th:field="*{title}" maxlength="80" required placeholder="Título"><p class="field-error" th:errors="*{title}"></p></div>
-<div class="field">
-  <label for="description">Descripción</label>
-  <textarea id="description" th:field="*{description}" maxlength="1200" required rows="4" placeholder="Breve descripción del juego"></textarea>
-  <p class="field-error" th:errors="*{description}"></p>
-</div>
-<div class="field-row"><div class="field"><label for="studio">Estudio</label><input id="studio" th:field="*{studio}" maxlength="60" required placeholder="Nombre del estudio"><p class="field-error" th:errors="*{studio}"></p></div><div class="field"><label for="releaseYear">Año de lanzamiento</label><input id="releaseYear" type="number" th:field="*{releaseYear}" min="1950" max="2100" required><p class="field-error" th:errors="*{releaseYear}"></p></div></div>
-<div class="field-row"><div class="field"><label for="genreId">Género</label><select id="genreId" th:field="*{genreId}" required><option value="">Elegí un género</option><option th:each="genre : ${genres}" th:value="${genre.id}" th:text="${genre.name}"></option></select><p class="field-error" th:errors="*{genreId}"></p><a class="helper-link" th:href="@{/generos}">Crear un género ↗</a></div><div class="field"><label for="platform">Plataforma</label><select id="platform" th:field="*{platform}"><option th:each="platform : ${platforms}" th:value="${platform}" th:text="${platform}"></option></select><p class="field-error" th:errors="*{platform}"></p></div></div>
-<fieldset class="cover-picker"><legend>Portada</legend><div class="cover-options"><label th:each="cover : ${covers}"><input type="radio" th:field="*{cover}" th:value="${cover}" required><img th:src="@{/images/{cover}.svg(cover=${cover})}" th:alt="${cover}"></label></div><p class="field-error" th:errors="*{cover}"></p></fieldset>
-<div class="form-actions"><a class="back" th:href="@{/}">Cancelar</a><button class="button light" type="submit">Guardar juego ↗</button></div></form></div></main><footer th:replace="~{fragments :: footer}"></footer></div><script th:src="@{/js/app.js}" defer></script></body></html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Agregar juego')}"></head>
+<body>
+    <div class="shell">
+        <header th:replace="~{fragments :: header('')}"></header>
+
+        <main class="inner-page">
+            <a class="back" th:href="@{/}">← Volver a juegos</a>
+            <h1>Agregar <em>juego.</em></h1>
+
+            <div class="form-layout">
+                <aside class="form-aside">
+                    <img th:src="@{/images/orbit.svg}" alt="Vista previa de portada" id="cover-preview">
+                    <small>Todos los campos son obligatorios.</small>
+                </aside>
+
+                <form class="editor-form" method="post" th:action="@{/juegos}" th:object="${gameForm}">
+                    <div class="field">
+                        <label for="title">Nombre del juego</label>
+                        <input id="title" th:field="*{title}" maxlength="80" required placeholder="Título">
+                        <p class="field-error" th:errors="*{title}"></p>
+                    </div>
+
+                    <div class="field">
+                        <label for="description">Descripción</label>
+                        <textarea id="description" th:field="*{description}" maxlength="1200" required rows="4"
+                                  placeholder="Breve descripción del juego"></textarea>
+                        <p class="field-error" th:errors="*{description}"></p>
+                    </div>
+
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="studio">Estudio</label>
+                            <input id="studio" th:field="*{studio}" maxlength="60" required
+                                   placeholder="Nombre del estudio">
+                            <p class="field-error" th:errors="*{studio}"></p>
+                        </div>
+                        <div class="field">
+                            <label for="releaseYear">Año de lanzamiento</label>
+                            <input id="releaseYear" type="number" th:field="*{releaseYear}" min="1950" max="2100"
+                                   required>
+                            <p class="field-error" th:errors="*{releaseYear}"></p>
+                        </div>
+                    </div>
+
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="genreId">Género</label>
+                            <select id="genreId" th:field="*{genreId}" required>
+                                <option value="">Elegí un género</option>
+                                <option th:each="genre : ${genres}" th:value="${genre.id}"
+                                        th:text="${genre.name}"></option>
+                            </select>
+                            <p class="field-error" th:errors="*{genreId}"></p>
+                            <a class="helper-link" th:href="@{/generos}">Crear un género ↗</a>
+                        </div>
+                        <div class="field">
+                            <label for="platform">Plataforma</label>
+                            <select id="platform" th:field="*{platform}">
+                                <option th:each="platform : ${platforms}" th:value="${platform}"
+                                        th:text="${platform}"></option>
+                            </select>
+                            <p class="field-error" th:errors="*{platform}"></p>
+                        </div>
+                    </div>
+
+                    <fieldset class="cover-picker">
+                        <legend>Portada</legend>
+                        <div class="cover-options">
+                            <label th:each="cover : ${covers}">
+                                <input type="radio" th:field="*{cover}" th:value="${cover}" required>
+                                <img th:src="@{/images/{cover}.svg(cover=${cover})}" th:alt="${cover}">
+                            </label>
+                        </div>
+                        <p class="field-error" th:errors="*{cover}"></p>
+                    </fieldset>
+
+                    <div class="form-actions">
+                        <a class="back" th:href="@{/}">Cancelar</a>
+                        <button class="button light" type="submit">Guardar juego ↗</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+        <footer th:replace="~{fragments :: footer}"></footer>
+    </div>
+    <script th:src="@{/js/app.js}" defer></script>
+</body>
+</html>

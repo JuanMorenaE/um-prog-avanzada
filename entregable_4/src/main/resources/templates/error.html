@@ -1,2 +1,18 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org"><head th:replace="~{fragments :: head('Error')}"></head><body><div class="shell"><header th:replace="~{fragments :: header('')}"></header><main class="inner-page empty-state"><p th:text="'Error ' + ${status}"></p><h1>Página no disponible.</h1><p>Volvé al inicio para continuar.</p><a class="button light" th:href="@{/}">Volver al inicio ↗</a></main><footer th:replace="~{fragments :: footer}"></footer></div></body></html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Error')}"></head>
+<body>
+    <div class="shell">
+        <header th:replace="~{fragments :: header('')}"></header>
+
+        <main class="inner-page empty-state">
+            <p th:text="'Error ' + ${status}"></p>
+            <h1>Página no disponible.</h1>
+            <p>Volvé al inicio para continuar.</p>
+            <a class="button light" th:href="@{/}">Volver al inicio ↗</a>
+        </main>
+
+        <footer th:replace="~{fragments :: footer}"></footer>
+    </div>
+</body>
+</html>

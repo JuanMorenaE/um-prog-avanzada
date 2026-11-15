@@ -13,14 +13,34 @@ import java.util.List;
 
 @Controller
 public class CatalogController {
+
     private final GameService games;
     private final GenreService genres;
-    public CatalogController(GameService games, GenreService genres) { this.games = games; this.genres = genres; }
-    @ModelAttribute("genres") public List<Genre> genres() { return genres.list(); }
-    @ModelAttribute("covers") public List<String> covers() { return List.of("orbit", "dunes", "bloom", "echo", "summit", "noir"); }
-    @ModelAttribute("platforms") public List<String> platforms() { return List.of("PC", "PlayStation", "Xbox", "Nintendo Switch", "Multiplataforma"); }
+
+    public CatalogController(GameService games, GenreService genres) {
+        this.games = games;
+        this.genres = genres;
+    }
+
+    @ModelAttribute("genres")
+    public List<Genre> genres() {
+        return genres.list();
+    }
+
+    @ModelAttribute("covers")
+    public List<String> covers() {
+        return List.of("orbit", "dunes", "bloom", "echo", "summit", "noir");
+    }
+
+    @ModelAttribute("platforms")
+    public List<String> platforms() {
+        return List.of("PC", "PlayStation", "Xbox", "Nintendo Switch", "Multiplataforma");
+    }
+
     @GetMapping("/")
-    public String catalog(@RequestParam(defaultValue = "") String q, @RequestParam(required = false) Long genre, Model model) {
+    public String catalog(@RequestParam(defaultValue = "") String q,
+                          @RequestParam(required = false) Long genre,
+                          Model model) {
         model.addAttribute("games", games.search(q, genre));
         model.addAttribute("total", games.count());
         model.addAttribute("featured", games.featured());
@@ -28,26 +48,56 @@ public class CatalogController {
         model.addAttribute("selectedGenre", genre);
         return "index";
     }
+
     @GetMapping("/juegos/nuevo")
-    public String newGame(Model model) { model.addAttribute("gameForm", new GameForm()); return "game-form"; }
+    public String newGame(Model model) {
+        model.addAttribute("gameForm", new GameForm());
+        return "game-form";
+    }
+
     @PostMapping("/juegos")
-    public String createGame(@Valid @ModelAttribute GameForm gameForm, BindingResult result, RedirectAttributes redirect) {
-        if (result.hasErrors()) return "game-form";
+    public String createGame(@Valid @ModelAttribute GameForm gameForm,
+                             BindingResult result,
+                             RedirectAttributes redirect) {
+        if (result.hasErrors()) {
+            return "game-form";
+        }
         Game game;
-        try { game = games.create(gameForm); }
-        catch (ResponseStatusException ex) { result.rejectValue("genreId", "invalid", "Ese género no existe. Elegí otro."); return "game-form"; }
+        try {
+            game = games.create(gameForm);
+        } catch (ResponseStatusException ex) {
+            result.rejectValue("genreId", "invalid", "Ese género no existe. Elegí otro.");
+            return "game-form";
+        }
         redirect.addFlashAttribute("success", "Juego agregado.");
         return "redirect:/juegos/" + game.getId();
     }
+
     @GetMapping("/juegos/{id}")
-    public String detail(@PathVariable Long id, Model model) { model.addAttribute("game", games.get(id)); return "game-detail"; }
+    public String detail(@PathVariable Long id, Model model) {
+        model.addAttribute("game", games.get(id));
+        return "game-detail";
+    }
+
     @GetMapping("/generos")
-    public String genrePage(Model model) { model.addAttribute("genreForm", new GenreForm()); return "genres"; }
+    public String genrePage(Model model) {
+        model.addAttribute("genreForm", new GenreForm());
+        return "genres";
+    }
+
     @PostMapping("/generos")
-    public String createGenre(@Valid @ModelAttribute GenreForm genreForm, BindingResult result, RedirectAttributes redirect) {
-        if (result.hasErrors()) return "genres";
-        try { genres.create(genreForm.getName()); }
-        catch (IllegalArgumentException ex) { result.rejectValue("name", "duplicate", ex.getMessage()); return "genres"; }
+    public String createGenre(@Valid @ModelAttribute GenreForm genreForm,
+                              BindingResult result,
+                              RedirectAttributes redirect) {
+        if (result.hasErrors()) {
+            return "genres";
+        }
+        try {
+            genres.create(genreForm.getName());
+        } catch (IllegalArgumentException ex) {
+            result.rejectValue("name", "duplicate", ex.getMessage());
+            return "genres";
+        }
         redirect.addFlashAttribute("success", "Género creado.");
         return "redirect:/generos";
     }
