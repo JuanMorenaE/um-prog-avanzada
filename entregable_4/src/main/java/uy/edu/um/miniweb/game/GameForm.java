@@ -3,7 +3,7 @@ package uy.edu.um.miniweb.game;
 import jakarta.validation.constraints.*;
 
 public class GameForm {
-    @NotBlank(message = "El título es obligatorio.")
+    // @NotBlank(message = "El título es obligatorio.")
     @Size(max = 80)
     private String title;
     @NotBlank(message = "Contanos de qué trata el juego.")
