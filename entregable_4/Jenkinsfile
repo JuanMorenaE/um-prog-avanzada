@@ -109,7 +109,7 @@ pipeline {
     }
 
     environment {
-        AMBIENTES_DIR = '/Users/juanmorenae/universidad-de-montevideo/programacion-avanzada/entregables/entregable_4/ambientes'
+        AMBIENTES_DIR = 'C:\Users\Maximo Faust\OneDrive\Escritorio\UM\Prog Avanzada\entregable4\um-prog-avanzada\entregable_4'
     }
 
     stages {
